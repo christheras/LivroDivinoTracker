@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rastreador de Livros Divinos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: cabeçalho, seletor de livros (categorias + busca), alvos escolhidos, resumo por tier,
+   seções de tier com cartões marcáveis, requisitos extras, árvore recolhível.
+   A cor de cada tier segue a escala de raridade: ardósia, jade, azul, roxo, ouro, carmim, magenta. */
+:root {
+  --bg: #EDF1EF; --surface: #FFFFFF; --surface2: #F5F8F6;
+  --fg: #15211E; --muted: #4F5F5A; --line: #CFD9D5;
+  --accent: #0B6B55; --on-accent: #FFFFFF; --danger: #B3362B;
+  --t1: #4C5A62; --t1bg: #E3E8EB;
+  --t2: #0B6B55; --t2bg: #D8EFE6;
+  --t3: #1D58A3; --t3bg: #DCE9F8;
+  --t4: #6A3C9E; --t4bg: #EBE0F7;
+  --t5: #8A5200; --t5bg: #F8E8C6;
+  --t6: #A3243B; --t6bg: #F9DDE2;
+  --t7: #912C80; --t7bg: #F4DCF0;
+  --font-display: 'Marcellus', 'Palatino Linotype', Georgia, serif;
+  --font-body: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1412; --surface: #151F1C; --surface2: #1A2623;
+    --fg: #E5EEEB; --muted: #98AAA4; --line: #28372F;
+    --accent: #4CC9A0; --on-accent: #06241A; --danger: #F08A80;
+    --t1: #B3C0C7; --t1bg: #212C31;
+    --t2: #5DD3AA; --t2bg: #12342A;
+    --t3: #86B8F2; --t3bg: #162A42;
+    --t4: #C4A3F2; --t4bg: #2A1D40;
+    --t5: #F2BA56; --t5bg: #3A2B0E;
+    --t6: #F29AAA; --t6bg: #41202A;
+    --t7: #E6A0DA; --t7bg: #3A1F36;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1412; --surface: #151F1C; --surface2: #1A2623;
+  --fg: #E5EEEB; --muted: #98AAA4; --line: #28372F;
+  --accent: #4CC9A0; --on-accent: #06241A; --danger: #F08A80;
+  --t1: #B3C0C7; --t1bg: #212C31;
+  --t2: #5DD3AA; --t2bg: #12342A;
+  --t3: #86B8F2; --t3bg: #162A42;
+  --t4: #C4A3F2; --t4bg: #2A1D40;
+  --t5: #F2BA56; --t5bg: #3A2B0E;
+  --t6: #F29AAA; --t6bg: #41202A;
+  --t7: #E6A0DA; --t7bg: #3A1F36;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+.t1, .t8 { --c: var(--t1); --cbg: var(--t1bg); }
+.t2 { --c: var(--t2); --cbg: var(--t2bg); }
+.t3 { --c: var(--t3); --cbg: var(--t3bg); }
+.t4 { --c: var(--t4); --cbg: var(--t4bg); }
+.t5 { --c: var(--t5); --cbg: var(--t5bg); }
+.t6 { --c: var(--t6); --cbg: var(--t6bg); }
+.t7 { --c: var(--t7); --cbg: var(--t7bg); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.1; }
+h2 { font-size: 22px; }
+h3 { font-size: 17px; line-height: 1.25; }
+p { margin: 0; }
+.eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.lede { color: var(--muted); max-width: 64ch; margin-top: 10px; font-size: 16px; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+.picker { display: flex; flex-direction: column; gap: 14px; }
+.picker-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; justify-content: space-between; }
+.search { display: flex; flex-direction: column; gap: 4px; flex: 1 1 240px; max-width: 360px; }
+.search label { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.search input { border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 10px 12px; min-height: 44px; width: 100%; }
+.cats { display: flex; flex-wrap: wrap; gap: 8px; }
+.cat { padding: 8px 12px; border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; font-weight: 500; min-height: 40px; display: inline-flex; align-items: center; gap: 8px; }
+.cat:hover { border-color: var(--accent); }
+.cat[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.cat .n { font-size: 12px; opacity: .8; }
+.picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 8px; }
+.grp { grid-column: 1 / -1; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.pick { text-align: left; border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; min-width: 0; position: relative; }
+.pick:hover { border-color: var(--c, var(--accent)); }
+.pick .pn { font-weight: 600; padding-right: 22px; overflow-wrap: anywhere; }
+.pick .pa { font-size: 12.5px; color: var(--muted); }
+.pick .pt { font-size: 11px; font-weight: 600; color: var(--c); background: var(--cbg); border-radius: 99px; padding: 1px 8px; align-self: flex-start; }
+.pick[aria-pressed="true"] { border-color: var(--accent); background: var(--surface); box-shadow: inset 0 0 0 1px var(--accent); }
+.pick[aria-pressed="true"]::after { content: '\2713'; position: absolute; top: 8px; right: 10px; color: var(--accent); font-weight: 700; }
+.none { color: var(--muted); padding: 8px 2px; }
+
+.goal { display: grid; grid-template-columns: 1fr minmax(180px, 260px); gap: 18px 28px; align-items: start; }
+.goal-list { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.goal-item { display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; }
+.goal-item h2 { font-size: 24px; margin-top: 4px; }
+.goal-item p { color: var(--muted); font-size: 14px; margin-top: 2px; }
+.rm { border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 6px 12px; font-size: 13px; min-height: 36px; white-space: nowrap; }
+.rm:hover { border-color: var(--danger); color: var(--danger); }
+.overall { display: flex; flex-direction: column; gap: 8px; }
+.overall .big { font-size: 34px; line-height: 1; }
+.overall .lbl { color: var(--muted); font-size: 13px; }
+.bar { height: 8px; background: var(--surface2); border: 1px solid var(--line); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--c, var(--accent)); }
+@media (prefers-reduced-motion: no-preference) { .bar i { transition: width .25s ease; } }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.tile { text-align: left; background: var(--cbg); border: 1px solid transparent; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; color: var(--c); min-width: 0; }
+.tile:hover { border-color: var(--c); }
+.tile .tn { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.tile .tc { font-size: 30px; line-height: 1; }
+.tile .td { font-size: 12px; opacity: .9; }
+.tile .bar { background: transparent; border-color: var(--c); opacity: .9; }
+
+.mats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.mat .k { color: var(--muted); font-size: 13px; }
+.mat .v { font-size: 26px; margin-top: 2px; }
+.mat .r { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+.tier-sec { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.sec-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pill { display: inline-block; background: var(--cbg); color: var(--c); border-radius: 99px; padding: 2px 10px; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+.sec-meta { color: var(--muted); font-size: 13px; }
+.sec-desc { color: var(--muted); max-width: 72ch; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card.done { border-color: var(--accent); background: var(--surface2); }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.card-top h3 { min-width: 0; overflow-wrap: anywhere; }
+.qty { font-size: 24px; line-height: 1; color: var(--c); background: var(--cbg); padding: 5px 9px; border-radius: 6px; white-space: nowrap; }
+.attrs { color: var(--muted); font-size: 13px; }
+.recipe { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.recipe li { display: flex; align-items: center; gap: 8px; font-size: 14px; background: var(--cbg); color: var(--c); border-radius: 6px; padding: 5px 9px; }
+.recipe li .num { font-size: 13px; }
+.recipe li .it { margin-left: auto; font-size: 11px; font-weight: 600; letter-spacing: .04em; opacity: .85; }
+.uses { font-size: 12.5px; color: var(--muted); }
+.card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; }
+.card-foot .lbl { font-size: 12.5px; color: var(--muted); }
+.counter { display: inline-flex; align-items: center; gap: 6px; }
+.counter .val { min-width: 54px; text-align: center; font-size: 15px; }
+.cbtn { width: 36px; height: 36px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface2); display: inline-grid; place-items: center; font-size: 18px; line-height: 1; }
+.cbtn:hover:not(:disabled) { border-color: var(--accent); }
+.cbtn:disabled { opacity: .35; cursor: default; }
+.cbtn.all { font-size: 14px; width: auto; padding: 0 10px; font-weight: 600; }
+.card.done .val { color: var(--accent); }
+
+.reqs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.reqs li { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 8px; }
+.reqs li:first-child { border-top: 0; padding-top: 0; }
+.reqs .rl { min-width: 0; overflow-wrap: anywhere; }
+.reqs .rt { color: var(--muted); }
+
+.treebox { display: flex; flex-direction: column; gap: 12px; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; font-weight: 500; min-height: 40px; }
+.btn:hover { border-color: var(--accent); }
+.btn.danger { border-color: var(--danger); color: var(--danger); }
+.tree-root { display: flex; flex-direction: column; gap: 16px; }
+.tree { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; overflow-x: auto; }
+.tree ul { list-style: none; margin: 0; padding-left: 20px; border-left: 1px solid var(--line); margin-left: 10px; }
+.tree > ul { border-left: 0; padding-left: 0; margin-left: 0; }
+.tree li { margin: 3px 0; }
+.tree summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+.tree summary::-webkit-details-marker { display: none; }
+.tree summary::before { content: '\25B8'; color: var(--muted); font-size: 12px; width: 12px; }
+.tree details[open] > summary::before { content: '\25BE'; }
+.tree .leaf { padding: 3px 0 3px 18px; }
+.tn { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.tn b { font-family: var(--font-mono); font-weight: 600; color: var(--c); }
+.tn em { font-style: normal; font-size: 11px; font-weight: 600; color: var(--c); background: var(--cbg); padding: 1px 7px; border-radius: 99px; }
+
+.info { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.info h2 { font-size: 19px; margin-bottom: 8px; }
+.info ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: var(--muted); }
+.info li b { color: var(--fg); font-weight: 600; }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+.foot a { color: var(--accent); }
+.credit { text-align: center; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 18px; }
+.credit b { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--accent); letter-spacing: .02em; }
+
+@media (max-width: 760px) {
+  .goal { grid-template-columns: 1fr; }
+}
+</style>
+<style>:root{color-scheme:light}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Perfect World · Livros Divinos</p>
+    <h1>Rastreador de livros</h1>
+    <p class="lede">Todos os livros divinos da wiki. Escolha um ou mais livros-alvo e a página monta a árvore, soma as quantidades de cada tier e guarda o que você já fabricou.</p>
+  </header>
+
+  <section class="panel picker" aria-label="Escolha o livro">
+    <div class="picker-top">
+      <h2>Escolha o livro-alvo</h2>
+      <div class="search">
+        <label for="q">Buscar livro</label>
+        <input id="q" type="search" placeholder="Ex.: Pan Gu, Destino, Domínio" autocomplete="off">
+      </div>
+    </div>
+    <div class="cats" id="cats" role="group" aria-label="Categoria"></div>
+    <div class="picks" id="picks"></div>
+  </section>
+
+  <div id="results"></div>
+
+  <section class="info">
+    <div class="panel">
+      <h2>Onde forjar</h2>
+      <ul>
+        <li><b>NPC Livros Divinos:</b> Cidade Universal (117, 855), perto da Leiloeira, ou Vale Primordial (392, 554), na saída da instância.</li>
+        <li><b>Pergaminho dos Deuses:</b> forjado na Administradora de Trocas, ao lado de um Banqueiro.</li>
+        <li><b>Fragmento de Escrita Divina:</b> vem do Vale Primordial, nos desafios de defesa da Rainha dos Ossos.</li>
+        <li><b>Livro em Branco Divino:</b> vendido na Loja de Gold, no mini-mapa do jogo.</li>
+        <li>Cada Tier 1 custa 3 fragmentos e 4 livros em branco. Os tiers acima só consomem os livros.</li>
+        <li><b>Livros de casamento:</b> Servo do Casamenteiro, Cidade do Dragão, Distrito Oeste.</li>
+        <li><b>Livros da Guerra das Nações:</b> fornalhas na Cidade do Dragão, Distrito Norte.</li>
+        <li><b>Livros do clã:</b> Livraria do Marechal, no Laboratório de Alquimia da Base Clã (nível IV em diante).</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>Notas sobre a wiki</h2>
+      <ul>
+        <li>Alguns nomes aparecem diferentes nas receitas da wiki. Padronizei: "Sorriso da Natureza" é o Sorriso da Flora, "Rose's Thorn" é Espinhos de Rosa e "Renascido nas Chamas" é Renascido das Chamas.</li>
+        <li>Na receita de Ao Sul dos Rios a wiki mostra "Decaying Tome". Usei Aniquilação, que bate com o custo de 45 fragmentos da própria wiki.</li>
+        <li>Conferi a receita de cada livro com os fragmentos que a wiki lista e todos batem.</li>
+        <li>A wiki é de 2021. Se a fornalha pedir algo diferente na 1.4.4, confie na fornalha.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Fonte: <a href="https://wikipw.com.br/index.php?title=Livros_Divinos" target="_blank" rel="noopener">Livros Divinos, Wiki PW</a>. O progresso fica salvo neste navegador.</span>
+    <button class="btn" id="reset" type="button">Zerar progresso desta seleção</button>
+  </footer>
+
+  <p class="credit">Feito por <b>Heras</b>, junto com o Claude.</p>
+</div>
+<script>
+var TIER_NAMES = { 1: 'Iniciante', 2: 'Aprendiz', 3: 'Discípulo', 4: 'Especialista', 5: 'Mestre', 6: 'Grão-Mestre', 7: 'Enciclopedista' };
+
+var RECIPES = {};
+function leaf(name, attrs) { RECIPES[name] = { tier: 1, attrs: attrs }; }
+function book(tier, name, ing, attrs) { RECIPES[name] = { tier: tier, ing: ing, attrs: attrs }; }
+function special(name, attrs) { RECIPES[name] = { tier: 7, attrs: attrs, special: true }; }
+function other(name, group, attrs, reqs) { RECIPES[name] = { tier: 8, group: group, attrs: attrs, reqs: reqs }; }
+
+/* Tier 1: Iniciante */
+leaf('Sorriso da Flora', 'Inteligência +5');
+leaf('Rio de Sangue', 'Recuperação de HP +3, Experiência +1%');
+leaf('Orgulho Paterno', 'Constituição +5');
+leaf('Favor do Imperador', 'Destreza +5');
+leaf('Poder Interno', 'Força +5');
+leaf('Chama Kármica', 'Inteligência +4, Constituição +3');
+leaf('Lua da Noite em Chamas', 'Recuperação de MP +3, Experiência +1%');
+leaf('Escudo Primo', 'Força +4, Constituição +3');
+leaf('Pessegueiro', 'Destreza +4, Constituição +3');
+
+/* Tier 2: Aprendiz */
+book(2, 'Lótus Vermelha', ['Sorriso da Flora', 'Chama Kármica', 'Pessegueiro'], 'Inteligência +7, Constituição +6');
+book(2, 'Flor de Pessegueiro', ['Pessegueiro', 'Favor do Imperador', 'Sorriso da Flora'], 'Destreza +10');
+book(2, 'Estampido', ['Orgulho Paterno', 'Escudo Primo', 'Chama Kármica'], 'Constituição +10');
+book(2, 'Lobo da Guerra', ['Rio de Sangue', 'Chama Kármica', 'Escudo Primo'], 'Recuperação de HP +6, Experiência +2%');
+book(2, 'Chuva de Pétalas', ['Pessegueiro', 'Favor do Imperador', 'Orgulho Paterno'], 'Destreza +7, Constituição +6');
+book(2, 'Resiliência', ['Escudo Primo', 'Poder Interno', 'Chama Kármica'], 'Força +10');
+book(2, 'Força Inigualável', ['Escudo Primo', 'Poder Interno', 'Orgulho Paterno'], 'Força +7, Constituição +6');
+book(2, 'Renascido das Chamas', ['Lua da Noite em Chamas', 'Chama Kármica', 'Sorriso da Flora'], 'Recuperação de MP +6, Experiência +2%');
+book(2, 'Chamas Secretas', ['Sorriso da Flora', 'Chama Kármica', 'Poder Interno'], 'Inteligência +10');
+
+/* Tier 3: Discípulo */
+book(3, 'Coração Leal de Gelo', ['Chamas Secretas', 'Flor de Pessegueiro', 'Resiliência'], 'Inteligência +15');
+book(3, 'Portal do Yang', ['Resiliência', 'Força Inigualável', 'Lótus Vermelha'], 'Força +15');
+book(3, 'Beleza Sem Forma', ['Flor de Pessegueiro', 'Força Inigualável', 'Chuva de Pétalas'], 'Destreza +15');
+book(3, 'Canção do Vinho', ['Força Inigualável', 'Estampido', 'Lótus Vermelha'], 'Força +9, Constituição +8');
+book(3, 'Som do Arrependimento', ['Estampido', 'Lótus Vermelha', 'Força Inigualável'], 'Constituição +15');
+book(3, 'Aniquilação', ['Lobo da Guerra', 'Chuva de Pétalas', 'Resiliência'], 'Recuperação de HP +9, Experiência +3%');
+book(3, 'Crepúsculo Eterno', ['Chuva de Pétalas', 'Flor de Pessegueiro', 'Estampido'], 'Destreza +9, Constituição +8');
+book(3, 'Chama Rubra', ['Chamas Secretas', 'Lótus Vermelha', 'Chuva de Pétalas'], 'Inteligência +9, Constituição +8');
+book(3, 'Fragrância da Chuva de Sangue', ['Renascido das Chamas', 'Lótus Vermelha', 'Chuva de Pétalas'], 'Recuperação de MP +9, Experiência +3%');
+
+/* Tier 4: Especialista */
+book(4, 'Espinhos de Rosa', ['Crepúsculo Eterno', 'Beleza Sem Forma', 'Chama Rubra'], 'Destreza +20');
+book(4, 'Destino', ['Portal do Yang', 'Canção do Vinho', 'Beleza Sem Forma'], 'Força +20');
+book(4, 'Encantador de Almas', ['Crepúsculo Eterno', 'Beleza Sem Forma', 'Chama Rubra'], 'Destreza +13, Constituição +12');
+book(4, 'Anarquia', ['Som do Arrependimento', 'Coração Leal de Gelo', 'Canção do Vinho'], 'Constituição +20');
+book(4, 'Tocado pelo Vento da Primavera', ['Chama Rubra', 'Coração Leal de Gelo', 'Som do Arrependimento'], 'Inteligência +20');
+book(4, 'Tigre do Vento, Dragão do Céu', ['Canção do Vinho', 'Portal do Yang', 'Crepúsculo Eterno'], 'Força +13, Constituição +12');
+book(4, 'Céu que Chora', ['Fragrância da Chuva de Sangue', 'Crepúsculo Eterno', 'Som do Arrependimento'], 'Recuperação de MP +12, Experiência +4%');
+book(4, 'Paixão', ['Chama Rubra', 'Coração Leal de Gelo', 'Portal do Yang'], 'Inteligência +13, Constituição +12');
+book(4, 'Ao Sul dos Rios', ['Aniquilação', 'Flor de Pessegueiro', 'Chamas Secretas'], 'Recuperação de HP +9, Experiência +4%');
+
+/* Tier 5: Mestre */
+book(5, 'Floresta Vasta', ['Encantador de Almas', 'Espinhos de Rosa', 'Anarquia'], 'Destreza +13, Constituição +12, Crítico +1%');
+book(5, 'Risada de Loucura', ['Anarquia', 'Tigre do Vento, Dragão do Céu', 'Paixão'], 'Constituição +25');
+book(5, 'Cidade Estrangeira', ['Encantador de Almas', 'Espinhos de Rosa', 'Destino'], 'Destreza +20, Crítico +1%');
+book(5, 'Disfarce de Sangue', ['Tigre do Vento, Dragão do Céu', 'Destino', 'Anarquia'], 'Força +13, Constituição +12, Crítico +1%');
+book(5, 'Júpiter', ['Espinhos de Rosa', 'Encantador de Almas', 'Anarquia'], 'Destreza +13, Constituição +12, Movimento +0,1 m/s');
+book(5, 'Arrogância', ['Tigre do Vento, Dragão do Céu', 'Destino', 'Anarquia'], 'Força +13, Constituição +12, HP +70');
+book(5, 'Os Quatro Grandes Elementos', ['Anarquia', 'Tigre do Vento, Dragão do Céu', 'Destino'], 'Força +20, Crítico +1%');
+book(5, 'Bênçãos da Terra', ['Tigre do Vento, Dragão do Céu', 'Anarquia', 'Paixão'], 'Constituição +20, Redução de dano físico +3%');
+book(5, 'Uivo do Mar', ['Encantador de Almas', 'Tocado pelo Vento da Primavera', 'Espinhos de Rosa'], 'Inteligência +20, Movimento +0,1 m/s');
+book(5, 'Fonte do Deserto', ['Espinhos de Rosa', 'Paixão', 'Tocado pelo Vento da Primavera'], 'Inteligência +13, Constituição +12, Movimento +0,1 m/s');
+book(5, 'Beleza da Serpente', ['Destino', 'Anarquia', 'Encantador de Almas'], 'Força +20, Movimento +0,1 m/s');
+book(5, 'Espelho do Nada', ['Ao Sul dos Rios', 'Céu que Chora', 'Paixão'], 'Força +9, Destreza +9, Constituição +8, Inteligência +9, Crítico +1%');
+book(5, 'Partindo os Céus e a Terra', ['Espinhos de Rosa', 'Encantador de Almas', 'Anarquia'], 'Destreza +25');
+book(5, 'Fragrância dos Céus', ['Paixão', 'Tocado pelo Vento da Primavera', 'Céu que Chora'], 'Inteligência +13, Constituição +12, Tempo de invocação -1%');
+book(5, 'Os Treze Guardiões', ['Ao Sul dos Rios', 'Céu que Chora', 'Paixão'], 'Força +9, Destreza +9, Constituição +8, Inteligência +9, HP +70');
+book(5, 'Água Gentil', ['Paixão', 'Tigre do Vento, Dragão do Céu', 'Tocado pelo Vento da Primavera'], 'Inteligência +20, Crítico +1%');
+
+/* Tier 6: Grão-Mestre */
+book(6, 'Lágrima Vermelha', ['Bênçãos da Terra', 'Os Quatro Grandes Elementos', 'Risada de Loucura'], 'Constituição +6, Redução de dano físico +6%');
+book(6, 'Mudança do Céu e da Terra', ['Arrogância', 'Beleza da Serpente', 'Disfarce de Sangue'], 'Força +13, Constituição +12, Redução de dano físico +6%');
+book(6, 'Ritmo das Ondas', ['Fragrância dos Céus', 'Água Gentil', 'Partindo os Céus e a Terra'], 'Inteligência +13, Constituição +12, Tempo de invocação -2%');
+book(6, 'Três Flores', ['Fragrância dos Céus', 'Cidade Estrangeira', 'Água Gentil'], 'Inteligência +13, Constituição +12, Crítico +2%');
+book(6, 'Coração Furioso', ['Os Quatro Grandes Elementos', 'Cidade Estrangeira', 'Disfarce de Sangue'], 'Força +20, Crítico +2%');
+book(6, 'Zen de Esquecimento', ['Risada de Loucura', 'Júpiter', 'Arrogância'], 'Destreza +13, Constituição +12, HP +140');
+book(6, 'Pan Gu', ['Os Treze Guardiões', 'Disfarce de Sangue', 'Espelho do Nada'], 'Força +9, Destreza +9, Constituição +8, Inteligência +9, Crítico +1%, Tempo de invocação -1%, Intervalo de ataque -0,05');
+book(6, 'Passar Rio com Palha', ['Beleza da Serpente', 'Cidade Estrangeira', 'Partindo os Céus e a Terra'], 'Destreza +20, Movimento +0,2 m/s');
+book(6, 'Dezoito Estudiosos', ['Água Gentil', 'Os Treze Guardiões', 'Beleza da Serpente'], 'Força +9, Destreza +9, Constituição +8, Inteligência +9, HP +70, MP +80');
+book(6, 'Gelo Estrangeiro', ['Uivo do Mar', 'Fonte do Deserto', 'Água Gentil'], 'Inteligência +35');
+book(6, 'Sorriso da Rainha', ['Floresta Vasta', 'Arrogância', 'Disfarce de Sangue'], 'Força +13, Constituição +12, Crítico +2%');
+book(6, 'Água que Perfura a Pedra', ['Risada de Loucura', 'Água Gentil', 'Os Quatro Grandes Elementos'], 'Constituição +20, Crítico +2%');
+book(6, 'Hades de Norte', ['Partindo os Céus e a Terra', 'Uivo do Mar', 'Risada de Loucura'], 'Inteligência +20, Movimento +0,2 m/s');
+book(6, 'Asa Unificadora', ['Partindo os Céus e a Terra', 'Fonte do Deserto', 'Júpiter'], 'Destreza +13, Constituição +12, Movimento +0,2 m/s');
+book(6, 'Vento da Manhã', ['Fonte do Deserto', 'Floresta Vasta', 'Partindo os Céus e a Terra'], 'Destreza +35');
+book(6, 'Segurar a Onda', ['Disfarce de Sangue', 'Beleza da Serpente', 'Arrogância'], 'Força +35');
+
+/* Tier 7: Enciclopedista (sem receita de livros) */
+special('Canto da Noite', 'Força +13, Destreza +13, Constituição +12, Inteligência +13, Crítico +1%, Tempo de invocação -1%, Intervalo de ataque -0,05');
+special('Trompete de Ferro', 'Inteligência +45');
+special('Canto de Dragão da Água', 'Constituição +45');
+special('Uma Bela Flor', 'Destreza +25, Movimento +0,2 m/s');
+special('Deus Erlang', 'Destreza +25, Crítico +2%');
+special('Três Estudiosos', 'Força +45');
+
+/* Outros: clã, casamento, Guerra das Nações */
+var CLAN_COINS = 'Moedas: 91.445.800';
+other('Pergaminho Filial da Vontade', 'Base do clã', 'Força +15', [{ label: 'Mérito', text: '29.030' }, { label: 'Moedas', text: '91.445.800' }]);
+other('Pergaminho Filial do Espírito', 'Base do clã', 'Inteligência +15', [{ label: 'Mérito', text: '29.030' }, { label: 'Moedas', text: '91.445.800' }]);
+other('Pergaminho Filial do Equilíbrio', 'Base do clã', 'Destreza +15', [{ label: 'Mérito', text: '29.030' }, { label: 'Moedas', text: '91.445.800' }]);
+other('Pergaminho Filial da Proteção', 'Base do clã', 'Constituição +15', [{ label: 'Mérito', text: '29.030' }, { label: 'Moedas', text: '91.445.800' }]);
+other('Pergaminho Filial da Sabedoria', 'Base do clã', 'Experiência +2%', [{ label: 'Mérito', text: '13.824' }, { label: 'Moedas', text: '43.545.600' }]);
+
+var MARRY = [{ label: 'Doce Lembrança', qty: 400 }, { label: 'Amor Eterno', qty: 99 }, { label: 'Moedas', text: '5.200.000' }];
+other('Pavão do Sudoeste', 'Casamento', 'Força +11, Destreza +11, Magia +11, Vitalidade +11, Nível de ataque +1, Nível de defesa +1', MARRY);
+other('Romance Ideal', 'Casamento', 'Magia +17, Vitalidade +16, Nível de ataque +2', MARRY);
+other('Desejo da Borboleta', 'Casamento', 'Destreza +17, Vitalidade +16, Nível de defesa +2', MARRY);
+other('Mortal Celestial', 'Casamento', 'Força +17, Vitalidade +16, Nível de defesa +2', MARRY);
+other('Jean Mon', 'Casamento', 'Magia +17, Vitalidade +16, Nível de defesa +2', MARRY);
+other('O Quarto do Lado Oeste', 'Casamento', 'Destreza +17, Vitalidade +16, Nível de defesa +2', MARRY);
+other('A Dama Branca', 'Casamento', 'Força +17, Vitalidade +16, Nível de defesa +2', MARRY);
+
+other('Domínio', 'Guerra das Nações', 'Força +25, Destreza +25, Inteligência +25, Crítico +2%, Tempo de invocação -3%, Intervalo de ataque -0,05, Movimento +0,1 m/s, HP +280', [
+  { label: '1 livro Enciclopedista, à sua escolha', qty: 1 },
+  { label: 'Selo do Soberano', qty: 157 }, { label: 'Ouro de Ébano', qty: 6 }, { label: 'Moedas', text: '30.000.000' }]);
+other('Imperador', 'Guerra das Nações', 'Força +45, Destreza +45, Inteligência +45, Crítico +3%, Tempo de invocação -5%, Intervalo de ataque -0,05, Movimento +0,2 m/s, HP +400', [
+  { label: 'Livro Domínio', qty: 1 },
+  { label: 'Selo do Soberano', qty: 538 }, { label: 'Ouro de Ébano', qty: 24 }, { label: 'Moedas', text: '90.000.000' }]);
+
+function tally(roots) {
+  var need = {}, parents = {};
+  function walk(name, parent) {
+    need[name] = (need[name] || 0) + 1;
+    if (parent) (parents[name] = parents[name] || new Set()).add(parent);
+    (RECIPES[name].ing || []).forEach(function (i) { walk(i, name); });
+  }
+  roots.forEach(function (r) { walk(r, null); });
+  var byTier = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+  Object.keys(need).forEach(function (n) { byTier[RECIPES[n].tier] += need[n]; });
+  return { need: need, parents: parents, byTier: byTier };
+}
+
+function materials(t1Total) {
+  return { fragments: t1Total * 3, blanks: t1Total * 4 };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { RECIPES: RECIPES, TIER_NAMES: TIER_NAMES, tally: tally, materials: materials };
+}
+</script>
+<script>
+(function () {
+  var CATS = [
+    { id: 'gm', label: 'Grão-Mestre', test: function (r) { return r.tier === 6; } },
+    { id: 'm', label: 'Mestre', test: function (r) { return r.tier === 5; } },
+    { id: 'enc', label: 'Enciclopedista', test: function (r) { return r.tier === 7; } },
+    { id: 'esp', label: 'Especialista', test: function (r) { return r.tier === 4; } },
+    { id: 'disc', label: 'Discípulo', test: function (r) { return r.tier === 3; } },
+    { id: 'apr', label: 'Aprendiz', test: function (r) { return r.tier === 2; } },
+    { id: 'ini', label: 'Iniciante', test: function (r) { return r.tier === 1; } },
+    { id: 'out', label: 'Clã, casamento e guerra', test: function (r) { return r.tier === 8; } }
+  ];
+  var TIER_DESC = {
+    1: 'A base da árvore. Cada livro custa 3 Fragmentos de Escrita Divina e 4 Livros em Branco Divinos.',
+    2: 'Cada livro usa 3 livros de Tier 1.',
+    3: 'Cada livro usa 3 livros de Tier 2.',
+    4: 'Cada livro usa 3 livros de Tier 3. Ao Sul dos Rios é a exceção e leva também 2 de Tier 2.',
+    5: 'Cada livro usa 3 livros de Tier 4.',
+    6: 'Cada livro usa 3 livros de Tier 5. Também dá para forjar direto com um Manuscrito do Destino, obtido em baús ou no Sistema de Chaves.',
+    7: 'Não usam outros livros na receita. Método I: forja direta com um Pergaminho dos Deuses (baús ou Sistema de Chaves). Método II: forje a Loucura do Luar com 1 livro Grão-Mestre mais 1 Escritura Ancestral (baús) e escolha livremente qualquer livro desta lista.'
+  };
+  var STORE = 'guia-livros-divinos-v2';
+  var DEFAULT_GOALS = ['Pan Gu'];
+
+  var state = { goals: DEFAULT_GOALS.slice(), cat: 'gm', prog: {} };
+  try {
+    var s = JSON.parse(localStorage.getItem(STORE));
+    if (s && typeof s === 'object') {
+      if (Array.isArray(s.goals)) state.goals = s.goals.filter(function (g) { return RECIPES[g]; });
+      if (s.cat) state.cat = s.cat;
+      if (s.prog && typeof s.prog === 'object') state.prog = s.prog;
+    }
+  } catch (e) {}
+  var query = '';
+
+  function persist() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+  function norm(x) { return x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function $(id) { return document.getElementById(id); }
+  function h(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (k.indexOf('on') === 0) e.addEventListener(k.slice(2), v);
+      else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
+    });
+    (kids || []).forEach(function (c) {
+      if (c == null) return;
+      e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+    });
+    return e;
+  }
+
+  function key() { return state.goals.slice().sort().join('|'); }
+  function getProg(k) { return (state.prog[key()] || {})[k] || 0; }
+  function setProg(k, v) {
+    var kk = key();
+    state.prog[kk] = state.prog[kk] || {};
+    state.prog[kk][k] = v;
+    persist();
+  }
+
+  /* ---------- seletor ---------- */
+  function namesIn(cat) {
+    return Object.keys(RECIPES).filter(function (n) { return cat.test(RECIPES[n]); });
+  }
+
+  function renderCats() {
+    var box = $('cats');
+    box.textContent = '';
+    CATS.forEach(function (c) {
+      box.appendChild(h('button', {
+        class: 'cat', type: 'button', 'aria-pressed': (!query && c.id === state.cat) ? 'true' : 'false',
+        onclick: function () { state.cat = c.id; query = ''; $('q').value = ''; persist(); renderCats(); renderPicks(); }
+      }, [h('span', { text: c.label }), h('span', { class: 'n num', text: String(namesIn(c).length) })]));
+    });
+  }
+
+  function pickButton(n, showTier) {
+    var r = RECIPES[n];
+    var selected = state.goals.indexOf(n) >= 0;
+    return h('button', {
+      class: 'pick t' + r.tier, type: 'button', 'aria-pressed': selected ? 'true' : 'false',
+      onclick: function () { toggleGoal(n); }
+    }, [
+      showTier ? h('span', { class: 'pt', text: r.tier === 8 ? r.group : 'Tier ' + r.tier + ' · ' + TIER_NAMES[r.tier] }) : null,
+      h('span', { class: 'pn', text: n }),
+      h('span', { class: 'pa', text: r.attrs })
+    ]);
+  }
+
+  function renderPicks() {
+    var box = $('picks');
+    box.textContent = '';
+    var list, searching = query.trim().length > 0;
+    if (searching) {
+      var q = norm(query.trim());
+      list = Object.keys(RECIPES).filter(function (n) { return norm(n).indexOf(q) >= 0 || norm(RECIPES[n].attrs).indexOf(q) >= 0; });
+      list.sort(function (a, b) { return RECIPES[b].tier - RECIPES[a].tier; });
+      if (!list.length) { box.appendChild(h('p', { class: 'none', text: 'Nenhum livro encontrado. Tente outro nome ou atributo.' })); return; }
+    } else {
+      var cat = CATS.filter(function (c) { return c.id === state.cat; })[0] || CATS[0];
+      list = namesIn(cat);
+    }
+    var lastGroup = null;
+    list.forEach(function (n) {
+      var r = RECIPES[n];
+      if (!searching && r.tier === 8 && r.group !== lastGroup) {
+        lastGroup = r.group;
+        box.appendChild(h('div', { class: 'grp', text: r.group }));
+      }
+      box.appendChild(pickButton(n, searching));
+    });
+  }
+
+  function toggleGoal(n) {
+    var i = state.goals.indexOf(n);
+    if (i >= 0) state.goals.splice(i, 1); else state.goals.push(n);
+    persist();
+    renderPicks();
+    renderResults();
+  }
+
+  /* ---------- resultados ---------- */
+  var data, cards, tierRefs, sumRefs, reqRefs;
+
+  function tiersPresent() {
+    return [1, 2, 3, 4, 5, 6, 7].filter(function (t) { return data.byTier[t] > 0; });
+  }
+  function namesOfTier(t) {
+    return Object.keys(data.need).filter(function (n) { return RECIPES[n].tier === t; })
+      .sort(function (a, b) { return data.need[b] - data.need[a] || a.localeCompare(b, 'pt'); });
+  }
+
+  function goalPanel() {
+    var bar = h('i');
+    sumRefs = { pct: h('div', { class: 'big num', text: '0%' }), sub: h('div', { class: 'lbl' }), bar: bar };
+    var list = h('div', { class: 'goal-list' }, state.goals.map(function (g) {
+      var r = RECIPES[g];
+      return h('div', { class: 'goal-item t' + r.tier }, [
+        h('div', null, [
+          h('span', { class: 'pill', text: r.tier === 8 ? r.group : 'Tier ' + r.tier + ' · ' + TIER_NAMES[r.tier] }),
+          h('h2', { text: g }),
+          h('p', { text: r.attrs })
+        ]),
+        h('button', { class: 'rm', type: 'button', 'aria-label': 'Remover ' + g, text: 'Remover', onclick: function () { toggleGoal(g); } })
+      ]);
+    }));
+    return h('section', { class: 'panel goal', 'aria-label': 'Livros escolhidos' }, [
+      list,
+      h('div', { class: 'overall' }, [sumRefs.pct, h('div', { class: 'bar' }, [bar]), sumRefs.sub])
+    ]);
+  }
+
+  function tilesPanel() {
+    tierRefs = {};
+    var box = h('section', { class: 'tiles', 'aria-label': 'Resumo por tier' });
+    tiersPresent().forEach(function (t) {
+      var bar = h('i');
+      var done = h('div', { class: 'td num' });
+      tierRefs[t] = { done: done, bar: bar, total: data.byTier[t] };
+      box.appendChild(h('button', {
+        class: 't' + t + ' tile', type: 'button',
+        onclick: function () { var el = $('tier-' + t); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      }, [
+        h('span', { class: 'tn', text: 'Tier ' + t + ' · ' + TIER_NAMES[t] }),
+        h('span', { class: 'tc num', text: String(data.byTier[t]) }),
+        h('div', { class: 'bar' }, [bar]),
+        done
+      ]));
+    });
+    return box;
+  }
+
+  function matsPanel() {
+    if (!data.byTier[1]) return null;
+    var m = materials(data.byTier[1]);
+    sumRefs.matFrag = h('div', { class: 'r num' });
+    sumRefs.matBlank = h('div', { class: 'r num' });
+    var total = 0;
+    [1, 2, 3, 4, 5, 6, 7].forEach(function (t) { total += data.byTier[t]; });
+    return h('section', { class: 'mats', 'aria-label': 'Materiais' }, [
+      h('div', { class: 'panel mat' }, [h('div', { class: 'k', text: 'Fragmentos de Escrita Divina' }), h('div', { class: 'v num', text: fmt(m.fragments) }), sumRefs.matFrag]),
+      h('div', { class: 'panel mat' }, [h('div', { class: 'k', text: 'Livros em Branco Divinos' }), h('div', { class: 'v num', text: fmt(m.blanks) }), sumRefs.matBlank]),
+      h('div', { class: 'panel mat' }, [h('div', { class: 'k', text: 'Livros a fabricar no total' }), h('div', { class: 'v num', text: String(total) }), h('div', { class: 'r', text: 'Soma de todos os tiers' })])
+    ]);
+  }
+
+  function makeCard(name, t) {
+    var r = RECIPES[name], need = data.need[name];
+    var parents = data.parents[name] ? Array.from(data.parents[name]).sort() : [];
+    var val = h('span', { class: 'val num' });
+    var minus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Diminuir ' + name, text: '−' });
+    var plus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Aumentar ' + name, text: '+' });
+    var all = h('button', { class: 'cbtn all', type: 'button', 'aria-label': 'Marcar todos de ' + name + ' como feitos', text: 'Todos' });
+    var card = h('article', { class: 'card t' + t }, [
+      h('div', { class: 'card-top' }, [h('h3', { text: name }), h('span', { class: 'qty num', text: need + 'x' })]),
+      h('p', { class: 'attrs', text: r.attrs }),
+      r.ing ? h('ul', { class: 'recipe', 'aria-label': 'Ingredientes de ' + name }, r.ing.map(function (i) {
+        return h('li', { class: 't' + RECIPES[i].tier }, [h('span', { class: 'num', text: '1x' }), h('span', { text: i }), h('span', { class: 'it', text: 'T' + RECIPES[i].tier })]);
+      })) : null,
+      parents.length ? h('p', { class: 'uses', text: 'Entra em: ' + parents.join(', ') }) : null,
+      h('div', { class: 'card-foot' }, [h('span', { class: 'lbl', text: 'Feitos' }), h('div', { class: 'counter' }, [minus, val, plus, all])])
+    ]);
+    minus.addEventListener('click', function () { setProg(name, Math.max(0, getProg(name) - 1)); refresh(); });
+    plus.addEventListener('click', function () { setProg(name, Math.min(need, getProg(name) + 1)); refresh(); });
+    all.addEventListener('click', function () { setProg(name, need); refresh(); });
+    cards[name] = { el: card, val: val, minus: minus, plus: plus, need: need, tier: t };
+    return card;
+  }
+
+  function tierSections() {
+    var wrap = h('div', { class: 'wrap', style: 'gap:28px' });
+    tiersPresent().forEach(function (t) {
+      var names = namesOfTier(t);
+      var done = h('span', { class: 'sec-meta num' });
+      var bar = h('i');
+      tierRefs[t].hdrDone = done;
+      tierRefs[t].hdrBar = bar;
+      wrap.appendChild(h('section', { class: 'tier-sec t' + t, id: 'tier-' + t }, [
+        h('div', { class: 'sec-head' }, [
+          h('div', { class: 'sec-title' }, [
+            h('h2', { text: 'Tier ' + t + ' · ' + TIER_NAMES[t] }),
+            h('span', { class: 'pill num', text: data.byTier[t] + (data.byTier[t] === 1 ? ' livro' : ' livros') })
+          ]),
+          done
+        ]),
+        h('div', { class: 'bar' }, [bar]),
+        h('p', { class: 'sec-desc', text: TIER_DESC[t] }),
+        h('div', { class: 'grid' }, names.map(function (n) { return makeCard(n, t); }))
+      ]));
+    });
+    return wrap;
+  }
+
+  function reqSections() {
+    var others = state.goals.filter(function (g) { return RECIPES[g].tier === 8; });
+    if (!others.length) return null;
+    var wrap = h('section', { class: 'tier-sec t8', 'aria-label': 'Requisitos extras' }, [
+      h('div', { class: 'sec-head' }, [h('h2', { text: 'Requisitos de clã, casamento e guerra' })]),
+      h('p', { class: 'sec-desc', text: 'Estes livros não usam a árvore de tiers. Marque os itens que você já juntou.' })
+    ]);
+    var grid = h('div', { class: 'grid' });
+    others.forEach(function (g) {
+      var r = RECIPES[g];
+      var ul = h('ul', { class: 'reqs' });
+      r.reqs.forEach(function (rq) {
+        var li = h('li');
+        li.appendChild(h('span', { class: 'rl', text: rq.label }));
+        if (rq.qty) {
+          var k = 'req:' + g + ':' + rq.label;
+          var val = h('span', { class: 'val num' });
+          var minus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Diminuir ' + rq.label, text: '−' });
+          var plus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Aumentar ' + rq.label, text: '+' });
+          var step = rq.qty > 50 ? 10 : 1;
+          var fill = h('button', { class: 'cbtn all', type: 'button', 'aria-label': 'Marcar ' + rq.label + ' completo', text: 'Todos' });
+          var upd = function () {
+            var v = Math.min(getProg(k), rq.qty);
+            val.textContent = v + '/' + rq.qty;
+            minus.disabled = v <= 0; plus.disabled = v >= rq.qty;
+          };
+          minus.addEventListener('click', function () { setProg(k, Math.max(0, getProg(k) - step)); upd(); });
+          plus.addEventListener('click', function () { setProg(k, Math.min(rq.qty, getProg(k) + step)); upd(); });
+          fill.addEventListener('click', function () { setProg(k, rq.qty); upd(); });
+          upd();
+          li.appendChild(h('div', { class: 'counter' }, [minus, val, plus, fill]));
+        } else {
+          li.appendChild(h('span', { class: 'rt num', text: rq.text }));
+        }
+        ul.appendChild(li);
+      });
+      grid.appendChild(h('article', { class: 'card t8' }, [
+        h('div', { class: 'card-top' }, [h('h3', { text: g }), h('span', { class: 'pill', text: r.group })]),
+        h('p', { class: 'attrs', text: r.attrs }),
+        ul
+      ]));
+    });
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  function treeNode(name, depth) {
+    var r = RECIPES[name];
+    var label = h('span', { class: 'tn t' + r.tier }, [h('b', { text: '1x' }), h('span', { text: name }), h('em', { text: 'T' + r.tier })]);
+    if (!r.ing) return h('li', null, [h('div', { class: 'leaf' }, [label])]);
+    return h('li', null, [h('details', { open: depth < 2 }, [
+      h('summary', null, [label]),
+      h('ul', null, r.ing.map(function (i) { return treeNode(i, depth + 1); }))
+    ])]);
+  }
+
+  function treePanel() {
+    var roots = state.goals.filter(function (g) { return RECIPES[g].ing; });
+    if (!roots.length) return null;
+    var tree = h('div', { class: 'tree-root' }, roots.map(function (r) {
+      return h('div', { class: 'tree' }, [h('ul', null, [treeNode(r, 0)])]);
+    }));
+    return h('section', { class: 'treebox', 'aria-label': 'Árvore completa' }, [
+      h('div', { class: 'sec-head' }, [
+        h('h2', { text: 'Árvore completa' }),
+        h('div', { class: 'btns' }, [
+          h('button', { class: 'btn', type: 'button', text: 'Abrir tudo', onclick: function () { tree.querySelectorAll('details').forEach(function (d) { d.open = true; }); } }),
+          h('button', { class: 'btn', type: 'button', text: 'Recolher', onclick: function () { tree.querySelectorAll('details').forEach(function (d) { d.open = false; }); } })
+        ])
+      ]),
+      h('p', { class: 'sec-desc', text: 'Cada linha é 1 livro. Abra um livro para ver os 3 que ele usa, até chegar nos Tier 1.' }),
+      tree
+    ]);
+  }
+
+  function renderResults() {
+    var box = $('results');
+    box.textContent = '';
+    cards = {}; tierRefs = {}; sumRefs = null;
+    if (!state.goals.length) {
+      box.appendChild(h('div', { class: 'panel' }, [h('h2', { text: 'Nenhum livro escolhido' }), h('p', { class: 'sec-desc', text: 'Toque em um livro acima para ver a árvore, as quantidades e marcar o progresso. Você pode escolher vários ao mesmo tempo.' })]));
+      return;
+    }
+    data = tally(state.goals);
+    var wrap = h('div', { class: 'wrap', style: 'gap:22px' });
+    wrap.appendChild(goalPanel());
+    var tiles = tilesPanel();
+    if (tiles.children.length) wrap.appendChild(tiles);
+    var mats = matsPanel();
+    if (mats) wrap.appendChild(mats);
+    wrap.appendChild(tierSections());
+    var rq = reqSections();
+    if (rq) wrap.appendChild(rq);
+    var tp = treePanel();
+    if (tp) wrap.appendChild(tp);
+    box.appendChild(wrap);
+    refresh();
+  }
+
+  function refresh() {
+    if (!sumRefs) return;
+    var doneBy = {};
+    Object.keys(cards).forEach(function (n) {
+      var c = cards[n], v = Math.min(getProg(n), c.need);
+      doneBy[c.tier] = (doneBy[c.tier] || 0) + v;
+      c.val.textContent = v + '/' + c.need;
+      c.el.classList.toggle('done', v >= c.need);
+      c.minus.disabled = v <= 0;
+      c.plus.disabled = v >= c.need;
+    });
+    var total = 0, done = 0;
+    Object.keys(tierRefs).forEach(function (t) {
+      var ref = tierRefs[t], tot = ref.total, d = doneBy[t] || 0;
+      total += tot; done += d;
+      var pct = tot ? (d / tot) * 100 : 0;
+      ref.bar.style.width = pct + '%';
+      ref.hdrBar.style.width = pct + '%';
+      ref.done.textContent = d + ' de ' + tot + ' feitos';
+      ref.hdrDone.textContent = d + ' de ' + tot + ' feitos';
+    });
+    var pctAll = total ? Math.round((done / total) * 100) : 0;
+    sumRefs.pct.textContent = pctAll + '%';
+    sumRefs.bar.style.width = pctAll + '%';
+    sumRefs.sub.textContent = total ? done + ' de ' + total + ' livros fabricados' : 'Sem livros na árvore';
+    if (sumRefs.matFrag) {
+      var left = data.byTier[1] - (doneBy[1] || 0);
+      var msg = left > 0 ? 'Ainda a gastar: ' : 'Todos os Tier 1 já foram feitos';
+      sumRefs.matFrag.textContent = left > 0 ? msg + fmt(left * 3) : msg;
+      sumRefs.matBlank.textContent = left > 0 ? msg + fmt(left * 4) : msg;
+    }
+  }
+
+  /* ---------- eventos ---------- */
+  $('q').addEventListener('input', function (e) {
+    query = e.target.value;
+    renderCats();
+    renderPicks();
+  });
+
+  var resetBtn = $('reset'), resetTimer = null;
+  function restoreReset() { resetBtn.classList.remove('danger'); resetBtn.textContent = 'Zerar progresso desta seleção'; }
+  resetBtn.addEventListener('click', function () {
+    if (!resetBtn.classList.contains('danger')) {
+      resetBtn.classList.add('danger');
+      resetBtn.textContent = 'Confirmar: zerar tudo';
+      resetTimer = setTimeout(restoreReset, 4000);
+      return;
+    }
+    clearTimeout(resetTimer);
+    state.prog[key()] = {};
+    persist();
+    restoreReset();
+    renderResults();
+  });
+
+  renderCats();
+  renderPicks();
+  renderResults();
+})();
+</script>
+
+</body>
+</html>
