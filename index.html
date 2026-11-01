@@ -2,12 +2,13 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rastreador de Livros Divinos</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-/* Layout: cabeçalho, seletor de livros (categorias + busca), alvos escolhidos, resumo por tier,
-   seções de tier com cartões marcáveis, requisitos extras, árvore recolhível.
+/* Layout: menu lateral fixo (busca, livros escolhidos, categorias, progresso por tier) + área principal
+   com cartões compactos por tier. Cada livro tem um espaço de ícone (icons/<nome>.png) com sigla de reserva.
+   A cor do cartão segue o progresso: vermelho em 0%, amarelo em 50%, verde em 100%.
    A cor de cada tier segue a escala de raridade: ardósia, jade, azul, roxo, ouro, carmim, magenta. */
 :root {
   --bg: #EDF1EF; --surface: #FFFFFF; --surface2: #F5F8F6;
@@ -58,12 +59,11 @@
 * { box-sizing: border-box; }
 body {
   background: var(--bg); color: var(--fg);
-  font-family: var(--font-body); font-size: 15px; line-height: 1.55;
-  padding-block: 28px 64px;
+  font-family: var(--font-body); font-size: 14px; line-height: 1.5;
+  padding-block: 18px 56px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
 .t1, .t8 { --c: var(--t1); --cbg: var(--t1bg); }
 .t2 { --c: var(--t2); --cbg: var(--t2bg); }
 .t3 { --c: var(--t3); --cbg: var(--t3bg); }
@@ -72,76 +72,90 @@ body {
 .t6 { --c: var(--t6); --cbg: var(--t6bg); }
 .t7 { --c: var(--t7); --cbg: var(--t7bg); }
 h1, h2, h3 { font-family: var(--font-display); font-weight: 400; margin: 0; text-wrap: balance; }
-h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.1; }
-h2 { font-size: 22px; }
-h3 { font-size: 17px; line-height: 1.25; }
+h1 { font-size: 27px; line-height: 1.1; }
+h2 { font-size: 20px; }
+h3 { font-size: 15px; line-height: 1.25; font-family: var(--font-body); font-weight: 600; }
 p { margin: 0; }
-.eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
-.lede { color: var(--muted); max-width: 64ch; margin-top: 10px; font-size: 16px; }
+.eyebrow { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
 .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.stack { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
-.picker { display: flex; flex-direction: column; gap: 14px; }
-.picker-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; justify-content: space-between; }
-.search { display: flex; flex-direction: column; gap: 4px; flex: 1 1 240px; max-width: 360px; }
-.search label { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.search input { border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 10px 12px; min-height: 44px; width: 100%; }
-.cats { display: flex; flex-wrap: wrap; gap: 8px; }
-.cat { padding: 8px 12px; border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; font-weight: 500; min-height: 40px; display: inline-flex; align-items: center; gap: 8px; }
-.cat:hover { border-color: var(--accent); }
-.cat[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-.cat .n { font-size: 12px; opacity: .8; }
-.picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 8px; }
-.grp { grid-column: 1 / -1; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
-.pick { text-align: left; border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; min-width: 0; position: relative; }
-.pick:hover { border-color: var(--c, var(--accent)); }
-.pick .pn { font-weight: 600; padding-right: 22px; overflow-wrap: anywhere; }
-.pick .pa { font-size: 12.5px; color: var(--muted); }
-.pick .pt { font-size: 11px; font-weight: 600; color: var(--c); background: var(--cbg); border-radius: 99px; padding: 1px 8px; align-self: flex-start; }
-.pick[aria-pressed="true"] { border-color: var(--accent); background: var(--surface); box-shadow: inset 0 0 0 1px var(--accent); }
-.pick[aria-pressed="true"]::after { content: '\2713'; position: absolute; top: 8px; right: 10px; color: var(--accent); font-weight: 700; }
-.none { color: var(--muted); padding: 8px 2px; }
+.app { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 26px; max-width: 1440px; margin: 0 auto; align-items: start; }
+.side { position: sticky; top: 14px; max-height: calc(100vh - 28px); overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 2px 6px 2px 2px; scrollbar-width: thin; }
+.main { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.sb { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.sb-h { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.hint { color: var(--muted); font-size: 13px; }
 
-.goal { display: grid; grid-template-columns: 1fr minmax(180px, 260px); gap: 18px 28px; align-items: start; }
-.goal-list { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.goal-item { display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; }
-.goal-item h2 { font-size: 24px; margin-top: 4px; }
-.goal-item p { color: var(--muted); font-size: 14px; margin-top: 2px; }
-.rm { border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 6px 12px; font-size: 13px; min-height: 36px; white-space: nowrap; }
+.search label { display: block; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.search input { border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 9px 12px; min-height: 40px; width: 100%; }
+
+.ico { position: relative; display: inline-grid; place-items: center; flex: none; width: var(--s, 32px); height: var(--s, 32px); border-radius: 8px; background: var(--cbg); color: var(--c); border: 1px solid var(--line); overflow: hidden; }
+.ico .ini { font-size: calc(var(--s, 32px) * .36); font-weight: 700; letter-spacing: .02em; }
+.ico img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ico.has .ini { visibility: hidden; }
+
+.mine-row { display: flex; align-items: center; gap: 10px; }
+.mine-row .mt { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.mine-row .mt b { font-weight: 600; overflow-wrap: anywhere; line-height: 1.2; }
+.mine-row .mt span { font-size: 12px; color: var(--c); }
+.rm { border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; width: 32px; height: 32px; font-size: 18px; line-height: 1; flex: none; }
 .rm:hover { border-color: var(--danger); color: var(--danger); }
-.overall { display: flex; flex-direction: column; gap: 8px; }
-.overall .big { font-size: 34px; line-height: 1; }
-.overall .lbl { color: var(--muted); font-size: 13px; }
+
+.cat { border-top: 1px solid var(--line); padding-top: 6px; }
+.cat:first-of-type { border-top: 0; padding-top: 0; }
+.cat summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; padding: 6px 2px; }
+.cat summary::-webkit-details-marker { display: none; }
+.cat summary::before { content: '\25B8'; color: var(--muted); font-size: 12px; margin-right: 6px; }
+.cat[open] summary::before { content: '\25BE'; }
+.cat summary .l { flex: 1; }
+.cat summary .n { font-size: 12px; color: var(--muted); }
+.cat summary .s { font-size: 11px; font-weight: 600; background: var(--accent); color: var(--on-accent); border-radius: 99px; padding: 0 7px; }
+.blist { display: flex; flex-direction: column; gap: 2px; padding-bottom: 6px; }
+.grp { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 6px 2px 2px; }
+.brow { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 5px 8px; border-radius: 8px; border: 1px solid transparent; background: transparent; position: relative; }
+.brow:hover { background: var(--surface2); }
+.brow[aria-pressed="true"] { background: var(--surface2); border-color: var(--accent); }
+.brow[aria-pressed="true"]::after { content: '\2713'; position: absolute; right: 10px; color: var(--accent); font-weight: 700; }
+.brow .bn { min-width: 0; flex: 1; font-weight: 500; line-height: 1.2; overflow-wrap: anywhere; padding-right: 18px; }
+.brow .bt { font-size: 11px; font-weight: 600; color: var(--c); }
+.none { color: var(--muted); padding: 6px 2px; }
+
+.tn-row { display: flex; flex-direction: column; gap: 4px; text-align: left; width: 100%; background: transparent; border: 0; border-radius: 8px; padding: 6px 4px; }
+.tn-row:hover { background: var(--surface2); }
+.tn-top { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+.tn-top .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
+.tn-top .tdn { margin-left: auto; font-size: 12px; color: var(--muted); }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.goal { display: grid; grid-template-columns: 1fr minmax(170px, 230px); gap: 14px 24px; align-items: center; }
+.goal-list { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.goal-item h2 { font-size: 22px; margin-top: 2px; }
+.goal-item p { color: var(--muted); font-size: 13px; }
+.overall { display: flex; flex-direction: column; gap: 6px; }
+.overall .big { font-size: 30px; line-height: 1; }
+.overall .lbl { color: var(--muted); font-size: 12.5px; }
+.pill { display: inline-block; background: var(--cbg); color: var(--c); border-radius: 99px; padding: 1px 9px; font-size: 11.5px; font-weight: 600; letter-spacing: .04em; }
 .bar { height: 8px; background: var(--surface2); border: 1px solid var(--line); border-radius: 99px; overflow: hidden; }
 .bar i { display: block; height: 100%; width: 0; background: var(--c, var(--accent)); }
 @media (prefers-reduced-motion: no-preference) { .bar i { transition: width .25s ease; } }
 
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-.tile { text-align: left; background: var(--cbg); border: 1px solid transparent; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; color: var(--c); min-width: 0; }
-.tile:hover { border-color: var(--c); }
-.tile .tn { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
-.tile .tc { font-size: 30px; line-height: 1; }
-.tile .td { font-size: 12px; opacity: .9; }
-.tile .bar { background: transparent; border-color: var(--c); opacity: .9; }
+.mats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.mat { padding: 10px 14px; }
+.mat .k { color: var(--muted); font-size: 12.5px; }
+.mat .v { font-size: 22px; line-height: 1.2; }
+.mat .r { font-size: 12px; color: var(--muted); }
 
-.mats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
-.mat .k { color: var(--muted); font-size: 13px; }
-.mat .v { font-size: 26px; margin-top: 2px; }
-.mat .r { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lg { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--sb); background: var(--sbg); color: var(--st); border-radius: 99px; padding: 3px 11px; font-size: 12.5px; font-weight: 600; }
+.lg .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--sc); }
+.how { color: var(--muted); font-size: 12.5px; max-width: 80ch; }
+.how summary { cursor: pointer; font-weight: 600; }
 
-.tier-sec { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px; }
-.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
-.sec-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.pill { display: inline-block; background: var(--cbg); color: var(--c); border-radius: 99px; padding: 2px 10px; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
-.sec-meta { color: var(--muted); font-size: 13px; }
-.sec-desc { color: var(--muted); max-width: 72ch; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: 12px; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-/* A cor de cada cartão vem do matiz --h: 4 (vermelho) em 0%, 46 (amarelo) em 50%, 140 (verde) em 100%.
-   O JavaScript ajusta --h em cada cartão. As classes abaixo são o valor inicial e a cor da legenda. */
+/* Cor do cartão pelo matiz --h: 4 (vermelho) em 0%, 46 (amarelo) em 50%, 140 (verde) em 100% */
 @property --h { syntax: '<number>'; inherits: true; initial-value: 4; }
 .s-none { --h: 4; }
 .s-prog { --h: 46; }
@@ -153,131 +167,153 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
   --sb: hsl(var(--h) var(--brs) var(--brl));
 }
 @media (prefers-reduced-motion: no-preference) { .card.s-none, .card.s-prog, .card.s-done { transition: --h .35s ease; } }
+
+.tier-sec { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 14px; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.sec-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sec-meta { color: var(--muted); font-size: 12.5px; }
+.sec-desc { color: var(--muted); max-width: 76ch; font-size: 13px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .card.s-done, .card.s-prog, .card.s-none { background: var(--sbg); border-color: var(--sb); }
-.prog { display: flex; flex-direction: column; gap: 6px; }
-.prog-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--st); }
-.status { display: inline-flex; align-items: center; gap: 7px; }
-.status::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--sc); flex: none; }
-.pct { font-size: 14px; }
-.pbar { height: 10px; border-radius: 99px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
-.pbar i { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--sc); }
-@media (prefers-reduced-motion: no-preference) { .pbar i { transition: width .25s ease; } }
-.legend { display: flex; flex-wrap: wrap; gap: 8px; }
-.lg { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--sb); background: var(--sbg); color: var(--st); border-radius: 99px; padding: 4px 12px; font-size: 13px; font-weight: 600; }
-.lg .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--sc); }
-.card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-.card-top h3 { min-width: 0; overflow-wrap: anywhere; }
-.qty { font-size: 24px; line-height: 1; color: var(--c); background: var(--cbg); padding: 5px 9px; border-radius: 6px; white-space: nowrap; }
-.attrs { color: var(--muted); font-size: 13px; }
-.recipe { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.recipe li { display: flex; align-items: center; gap: 8px; font-size: 14px; background: var(--cbg); color: var(--c); border-radius: 6px; padding: 5px 9px; }
-.recipe li .num { font-size: 13px; }
-.recipe li .it { margin-left: auto; font-size: 11px; font-weight: 600; letter-spacing: .04em; opacity: .85; }
-.uses { font-size: 12.5px; color: var(--muted); }
-.card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; }
-.card-foot .lbl { font-size: 12.5px; color: var(--muted); }
-.counter { display: inline-flex; align-items: center; gap: 6px; }
-.counter .val { min-width: 54px; text-align: center; font-size: 15px; }
-.cbtn { width: 36px; height: 36px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface2); display: inline-grid; place-items: center; font-size: 18px; line-height: 1; }
+.c-top { display: flex; align-items: flex-start; gap: 10px; }
+.c-id { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.c-id h3 { overflow-wrap: anywhere; }
+.attrs { color: var(--muted); font-size: 12px; line-height: 1.3; }
+.stock { font-size: 11.5px; color: var(--muted); }
+.qty { font-size: 17px; line-height: 1; color: var(--c); background: var(--cbg); padding: 4px 7px; border-radius: 6px; white-space: nowrap; }
+
+.recipe { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.recipe li { display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; background: var(--cbg); color: var(--c); border-radius: 6px; padding: 4px 7px 5px; --h: 4; }
+.recipe li .ri { display: flex; align-items: center; gap: 7px; }
+.recipe li .rn { min-width: 0; flex: 1; overflow-wrap: anywhere; line-height: 1.2; }
+.recipe li .rc { font-size: 12px; font-weight: 600; color: hsl(var(--h) var(--ts) var(--tl)); white-space: nowrap; }
+.rbar { height: 4px; border-radius: 99px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.rbar i { display: block; height: 100%; width: 0; border-radius: 99px; background: hsl(var(--h) var(--cs) var(--cl)); }
+@media (prefers-reduced-motion: no-preference) { .rbar i { transition: width .25s ease; } }
+.ready { font-size: 12px; font-weight: 600; border-radius: 6px; padding: 4px 8px; }
+.ready.go { background: hsl(140 var(--bs) var(--bl)); border: 1px solid hsl(140 var(--brs) var(--brl)); color: hsl(140 var(--ts) var(--tl)); }
+.ready.fin { background: var(--surface2); border: 1px solid var(--line); color: var(--muted); }
+.ready.go::before, .ready.fin::before { content: '\2713 '; }
+
+.c-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+.counter { display: inline-flex; align-items: center; gap: 4px; }
+.counter .val { min-width: 46px; text-align: center; font-size: 13px; }
+.cbtn { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); display: inline-grid; place-items: center; font-size: 16px; line-height: 1; }
 .cbtn:hover:not(:disabled) { border-color: var(--accent); }
 .cbtn:disabled { opacity: .35; cursor: default; }
-.cbtn.all { font-size: 14px; width: auto; padding: 0 10px; font-weight: 600; }
+.cbtn.all { font-size: 12px; width: auto; padding: 0 8px; font-weight: 600; }
+.pct { font-size: 13px; font-weight: 600; color: var(--st); }
+.pbar { height: 7px; border-radius: 99px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
+.pbar i { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--sc); }
+@media (prefers-reduced-motion: no-preference) { .pbar i { transition: width .25s ease; } }
 
-.reqs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.reqs li { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 8px; }
+.reqs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.reqs li { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 6px; }
 .reqs li:first-child { border-top: 0; padding-top: 0; }
 .reqs .rl { min-width: 0; overflow-wrap: anywhere; }
 .reqs .rt { color: var(--muted); }
 
-.treebox { display: flex; flex-direction: column; gap: 12px; }
+.treebox { display: flex; flex-direction: column; gap: 10px; }
 .btns { display: flex; gap: 8px; flex-wrap: wrap; }
-.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; font-weight: 500; min-height: 40px; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 12px; font-weight: 500; min-height: 36px; }
 .btn:hover { border-color: var(--accent); }
 .btn.danger { border-color: var(--danger); color: var(--danger); }
-.tree-root { display: flex; flex-direction: column; gap: 16px; }
-.tree { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; overflow-x: auto; }
+.tree-root { display: flex; flex-direction: column; gap: 14px; }
+.tree { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; overflow-x: auto; }
 .tree ul { list-style: none; margin: 0; padding-left: 20px; border-left: 1px solid var(--line); margin-left: 10px; }
 .tree > ul { border-left: 0; padding-left: 0; margin-left: 0; }
-.tree li { margin: 3px 0; }
-.tree summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+.tree li { margin: 2px 0; }
+.tree summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px; padding: 2px 0; }
 .tree summary::-webkit-details-marker { display: none; }
 .tree summary::before { content: '\25B8'; color: var(--muted); font-size: 12px; width: 12px; }
 .tree details[open] > summary::before { content: '\25BE'; }
-.tree .leaf { padding: 3px 0 3px 18px; }
+.tree .leaf { padding: 2px 0 2px 18px; }
 .tn { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
 .tn b { font-family: var(--font-mono); font-weight: 600; color: var(--c); }
 .tn em { font-style: normal; font-size: 11px; font-weight: 600; color: var(--c); background: var(--cbg); padding: 1px 7px; border-radius: 99px; }
 
-.info { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
-.info h2 { font-size: 19px; margin-bottom: 8px; }
+.info { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
+.info h2 { font-size: 18px; margin-bottom: 8px; }
 .info ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: var(--muted); }
 .info li b { color: var(--fg); font-weight: 600; }
+.info code { font-family: var(--font-mono); font-size: 12px; background: var(--surface2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
 .foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
 .foot a { color: var(--accent); }
-.credit { text-align: center; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 18px; }
+.credit { text-align: center; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
 .credit b { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--accent); letter-spacing: .02em; }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; max-height: none; overflow: visible; padding: 0; }
   .goal { grid-template-columns: 1fr; }
 }
 </style>
-<style>:root{color-scheme:light}body{margin:0}[hidden]{display:none!important}</style>
 </head>
 <body>
 
-<div class="wrap">
-  <header>
-    <p class="eyebrow">Perfect World · Livros Divinos</p>
-    <h1>Rastreador de livros</h1>
-    <p class="lede">Todos os livros divinos da wiki. Escolha um ou mais livros-alvo e a página monta a árvore, soma as quantidades de cada tier e guarda o que você já fabricou.</p>
-  </header>
 
-  <section class="panel picker" aria-label="Escolha o livro">
-    <div class="picker-top">
-      <h2>Escolha o livro-alvo</h2>
-      <div class="search">
-        <label for="q">Buscar livro</label>
-        <input id="q" type="search" placeholder="Ex.: Pan Gu, Destino, Domínio" autocomplete="off">
+<div class="app">
+  <aside class="side" aria-label="Escolha dos livros">
+    <div>
+      <p class="eyebrow">Perfect World · Livros Divinos</p>
+      <h1>Rastreador de livros</h1>
+    </div>
+    <div class="sb search">
+      <label for="q">Buscar livro</label>
+      <input id="q" type="search" placeholder="Ex.: Pan Gu, Destino, Domínio" autocomplete="off">
+    </div>
+    <div class="sb" id="mine"></div>
+    <div class="sb" id="books"></div>
+    <div class="sb" id="tnav"></div>
+  </aside>
+
+  <main class="main">
+    <div id="results"></div>
+
+    <section class="info">
+      <div class="panel">
+        <h2>Onde forjar</h2>
+        <ul>
+          <li><b>NPC Livros Divinos:</b> Cidade Universal (117, 855), perto da Leiloeira, ou Vale Primordial (392, 554), na saída da instância.</li>
+          <li><b>Pergaminho dos Deuses:</b> forjado na Administradora de Trocas, ao lado de um Banqueiro.</li>
+          <li><b>Fragmento de Escrita Divina:</b> vem do Vale Primordial, nos desafios de defesa da Rainha dos Ossos.</li>
+          <li><b>Livro em Branco Divino:</b> vendido na Loja de Gold, no mini-mapa do jogo.</li>
+          <li>Cada Tier 1 custa 3 fragmentos e 4 livros em branco. Os tiers acima só consomem os livros.</li>
+          <li><b>Livros de casamento:</b> Servo do Casamenteiro, Cidade do Dragão, Distrito Oeste.</li>
+          <li><b>Livros da Guerra das Nações:</b> fornalhas na Cidade do Dragão, Distrito Norte.</li>
+          <li><b>Livros do clã:</b> Livraria do Marechal, no Laboratório de Alquimia da Base Clã (nível IV em diante).</li>
+        </ul>
       </div>
-    </div>
-    <div class="cats" id="cats" role="group" aria-label="Categoria"></div>
-    <div class="picks" id="picks"></div>
-  </section>
+      <div class="panel">
+        <h2>Notas sobre a wiki</h2>
+        <ul>
+          <li>Alguns nomes aparecem diferentes nas receitas da wiki. Padronizei: "Sorriso da Natureza" é o Sorriso da Flora, "Rose's Thorn" é Espinhos de Rosa e "Renascido nas Chamas" é Renascido das Chamas.</li>
+          <li>Na receita de Ao Sul dos Rios a wiki mostra "Decaying Tome". Usei Aniquilação, que bate com o custo de 45 fragmentos da própria wiki.</li>
+          <li>Conferi a receita de cada livro com os fragmentos que a wiki lista e todos batem.</li>
+          <li>A wiki é de 2021. Se a fornalha pedir algo diferente na 1.4.4, confie na fornalha.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h2>Ícones dos livros</h2>
+        <ul>
+          <li>Cada livro lê a imagem <code>icons/nome-do-livro.png</code>, na mesma pasta desta página.</li>
+          <li>Sem a imagem, aparece a sigla do livro na cor do tier.</li>
+          <li>O nome do arquivo é o nome do livro em minúsculas, sem acento e com hífens. Exemplo: <code>chuva-de-petalas.png</code>.</li>
+          <li>Tamanho recomendado: 64×64 pixels, PNG.</li>
+        </ul>
+      </div>
+    </section>
 
-  <div id="results"></div>
+    <footer class="foot">
+      <span>Fonte: <a href="https://wikipw.com.br/index.php?title=Livros_Divinos" target="_blank" rel="noopener">Livros Divinos, Wiki PW</a>. O progresso fica salvo neste navegador.</span>
+      <button class="btn" id="reset" type="button">Zerar progresso desta seleção</button>
+    </footer>
 
-  <section class="info">
-    <div class="panel">
-      <h2>Onde forjar</h2>
-      <ul>
-        <li><b>NPC Livros Divinos:</b> Cidade Universal (117, 855), perto da Leiloeira, ou Vale Primordial (392, 554), na saída da instância.</li>
-        <li><b>Pergaminho dos Deuses:</b> forjado na Administradora de Trocas, ao lado de um Banqueiro.</li>
-        <li><b>Fragmento de Escrita Divina:</b> vem do Vale Primordial, nos desafios de defesa da Rainha dos Ossos.</li>
-        <li><b>Livro em Branco Divino:</b> vendido na Loja de Gold, no mini-mapa do jogo.</li>
-        <li>Cada Tier 1 custa 3 fragmentos e 4 livros em branco. Os tiers acima só consomem os livros.</li>
-        <li><b>Livros de casamento:</b> Servo do Casamenteiro, Cidade do Dragão, Distrito Oeste.</li>
-        <li><b>Livros da Guerra das Nações:</b> fornalhas na Cidade do Dragão, Distrito Norte.</li>
-        <li><b>Livros do clã:</b> Livraria do Marechal, no Laboratório de Alquimia da Base Clã (nível IV em diante).</li>
-      </ul>
-    </div>
-    <div class="panel">
-      <h2>Notas sobre a wiki</h2>
-      <ul>
-        <li>Alguns nomes aparecem diferentes nas receitas da wiki. Padronizei: "Sorriso da Natureza" é o Sorriso da Flora, "Rose's Thorn" é Espinhos de Rosa e "Renascido nas Chamas" é Renascido das Chamas.</li>
-        <li>Na receita de Ao Sul dos Rios a wiki mostra "Decaying Tome". Usei Aniquilação, que bate com o custo de 45 fragmentos da própria wiki.</li>
-        <li>Conferi a receita de cada livro com os fragmentos que a wiki lista e todos batem.</li>
-        <li>A wiki é de 2021. Se a fornalha pedir algo diferente na 1.4.4, confie na fornalha.</li>
-      </ul>
-    </div>
-  </section>
-
-  <footer class="foot">
-    <span>Fonte: <a href="https://wikipw.com.br/index.php?title=Livros_Divinos" target="_blank" rel="noopener">Livros Divinos, Wiki PW</a>. O progresso fica salvo neste navegador.</span>
-    <button class="btn" id="reset" type="button">Zerar progresso desta seleção</button>
-  </footer>
-
-  <p class="credit">Feito por <b>Heras</b>, junto com o Claude.</p>
+    <p class="credit">Feito por <b>Heras</b>, junto com o Claude.</p>
+  </main>
 </div>
+
 <script>
 var TIER_NAMES = { 1: 'Iniciante', 2: 'Aprendiz', 3: 'Discípulo', 4: 'Especialista', 5: 'Mestre', 6: 'Grão-Mestre', 7: 'Enciclopedista' };
 
@@ -419,8 +455,7 @@ function materials(t1Total) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { RECIPES: RECIPES, TIER_NAMES: TIER_NAMES, tally: tally, materials: materials };
 }
-</script>
-<script>
+
 (function () {
   var CATS = [
     { id: 'gm', label: 'Grão-Mestre', test: function (r) { return r.tier === 6; } },
@@ -484,56 +519,92 @@ if (typeof module !== 'undefined' && module.exports) {
     persist();
   }
 
-  /* ---------- seletor ---------- */
+  /* ---------- ícones ---------- */
+  function slug(n) { return norm(n).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+  function initials(n) {
+    var w = n.split(/\s+/).filter(function (x) { return x.length > 2 || /^\d/.test(x); });
+    if (!w.length) w = n.split(/\s+/);
+    return (w[0][0] + (w[1] ? w[1][0] : (w[0][1] || ''))).toUpperCase();
+  }
+  function icon(name, size) {
+    var r = RECIPES[name];
+    var box = h('span', { class: 'ico t' + r.tier, style: '--s:' + size + 'px', 'aria-hidden': 'true' }, [h('span', { class: 'ini', text: initials(name) })]);
+    var img = new Image();
+    img.alt = '';
+    img.onload = function () { box.classList.add('has'); box.appendChild(img); };
+    img.src = 'icons/' + slug(name) + '.png';
+    return box;
+  }
+
+  /* ---------- menu lateral ---------- */
+  var openCats = {};
+  openCats[state.cat] = true;
   function namesIn(cat) {
     return Object.keys(RECIPES).filter(function (n) { return cat.test(RECIPES[n]); });
   }
+  function tierLabel(r) { return r.tier === 8 ? r.group : 'Tier ' + r.tier + ' · ' + TIER_NAMES[r.tier]; }
 
-  function renderCats() {
-    var box = $('cats');
+  function renderMine() {
+    var box = $('mine');
     box.textContent = '';
-    CATS.forEach(function (c) {
-      box.appendChild(h('button', {
-        class: 'cat', type: 'button', 'aria-pressed': (!query && c.id === state.cat) ? 'true' : 'false',
-        onclick: function () { state.cat = c.id; query = ''; $('q').value = ''; persist(); renderCats(); renderPicks(); }
-      }, [h('span', { text: c.label }), h('span', { class: 'n num', text: String(namesIn(c).length) })]));
+    box.appendChild(h('div', { class: 'sb-h', text: 'Meus livros' }));
+    if (!state.goals.length) {
+      box.appendChild(h('p', { class: 'hint', text: 'Escolha um ou mais livros na lista abaixo.' }));
+      return;
+    }
+    state.goals.forEach(function (g) {
+      var r = RECIPES[g];
+      box.appendChild(h('div', { class: 'mine-row t' + r.tier }, [
+        icon(g, 36),
+        h('div', { class: 'mt' }, [h('b', { text: g }), h('span', { text: tierLabel(r) })]),
+        h('button', { class: 'rm', type: 'button', 'aria-label': 'Remover ' + g, text: '×', onclick: function () { toggleGoal(g); } })
+      ]));
     });
   }
 
-  function pickButton(n, showTier) {
+  function bookRow(n) {
     var r = RECIPES[n];
-    var selected = state.goals.indexOf(n) >= 0;
     return h('button', {
-      class: 'pick t' + r.tier, type: 'button', 'aria-pressed': selected ? 'true' : 'false',
-      onclick: function () { toggleGoal(n); }
-    }, [
-      showTier ? h('span', { class: 'pt', text: r.tier === 8 ? r.group : 'Tier ' + r.tier + ' · ' + TIER_NAMES[r.tier] }) : null,
-      h('span', { class: 'pn', text: n }),
-      h('span', { class: 'pa', text: r.attrs })
-    ]);
+      class: 'brow t' + r.tier, type: 'button', 'aria-pressed': state.goals.indexOf(n) >= 0 ? 'true' : 'false',
+      title: r.attrs, onclick: function () { toggleGoal(n); }
+    }, [icon(n, 28), h('span', { class: 'bn', text: n })]);
   }
 
-  function renderPicks() {
-    var box = $('picks');
+  function renderBooks() {
+    var box = $('books');
     box.textContent = '';
-    var list, searching = query.trim().length > 0;
-    if (searching) {
-      var q = norm(query.trim());
-      list = Object.keys(RECIPES).filter(function (n) { return norm(n).indexOf(q) >= 0 || norm(RECIPES[n].attrs).indexOf(q) >= 0; });
-      list.sort(function (a, b) { return RECIPES[b].tier - RECIPES[a].tier; });
-      if (!list.length) { box.appendChild(h('p', { class: 'none', text: 'Nenhum livro encontrado. Tente outro nome ou atributo.' })); return; }
-    } else {
-      var cat = CATS.filter(function (c) { return c.id === state.cat; })[0] || CATS[0];
-      list = namesIn(cat);
+    var q = norm(query.trim());
+    if (q) {
+      box.appendChild(h('div', { class: 'sb-h', text: 'Resultado da busca' }));
+      var list = Object.keys(RECIPES).filter(function (n) { return norm(n).indexOf(q) >= 0 || norm(RECIPES[n].attrs).indexOf(q) >= 0; })
+        .sort(function (a, b) { return RECIPES[b].tier - RECIPES[a].tier; });
+      if (!list.length) { box.appendChild(h('p', { class: 'none', text: 'Nenhum livro encontrado.' })); return; }
+      var lb = h('div', { class: 'blist' });
+      list.forEach(function (n) { lb.appendChild(bookRow(n)); });
+      box.appendChild(lb);
+      return;
     }
-    var lastGroup = null;
-    list.forEach(function (n) {
-      var r = RECIPES[n];
-      if (!searching && r.tier === 8 && r.group !== lastGroup) {
-        lastGroup = r.group;
-        box.appendChild(h('div', { class: 'grp', text: r.group }));
-      }
-      box.appendChild(pickButton(n, searching));
+    box.appendChild(h('div', { class: 'sb-h', text: 'Todos os livros' }));
+    CATS.forEach(function (c) {
+      var names = namesIn(c);
+      var sel = names.filter(function (n) { return state.goals.indexOf(n) >= 0; }).length;
+      var det = h('details', { class: 'cat', open: !!openCats[c.id] }, [
+        h('summary', null, [
+          h('span', { class: 'l', text: c.label }),
+          sel ? h('span', { class: 's num', text: String(sel) }) : null,
+          h('span', { class: 'n num', text: String(names.length) })
+        ])
+      ]);
+      det.addEventListener('toggle', function () { openCats[c.id] = det.open; state.cat = c.id; });
+      var lb = h('div', { class: 'blist' });
+      var lastGroup = null;
+      names.forEach(function (n) {
+        var r = RECIPES[n];
+        if (r.tier === 8 && r.group !== lastGroup) { lastGroup = r.group; lb.appendChild(h('div', { class: 'grp', text: r.group })); }
+        lb.appendChild(bookRow(n));
+      });
+      det.appendChild(lb);
+      box.appendChild(det);
     });
   }
 
@@ -541,13 +612,16 @@ if (typeof module !== 'undefined' && module.exports) {
     var i = state.goals.indexOf(n);
     if (i >= 0) state.goals.splice(i, 1); else state.goals.push(n);
     persist();
-    renderPicks();
+    renderMine();
+    renderBooks();
     renderResults();
   }
 
   /* ---------- resultados ---------- */
   var data, cards, tierRefs, sumRefs, reqRefs, legendRefs;
   var STATUS = { done: 'Completo', prog: 'Em andamento', none: 'Não iniciado' };
+  /* Matiz de 0 a 100%: 4 (vermelho), 46 (amarelo) em 50%, 140 (verde) em 100%. */
+  function hueFor(pct) { return pct <= 50 ? 4 + (pct / 50) * 42 : 46 + ((pct - 50) / 50) * 94; }
 
   function tiersPresent() {
     return [1, 2, 3, 4, 5, 6, 7].filter(function (t) { return data.byTier[t] > 0; });
@@ -563,12 +637,9 @@ if (typeof module !== 'undefined' && module.exports) {
     var list = h('div', { class: 'goal-list' }, state.goals.map(function (g) {
       var r = RECIPES[g];
       return h('div', { class: 'goal-item t' + r.tier }, [
-        h('div', null, [
-          h('span', { class: 'pill', text: r.tier === 8 ? r.group : 'Tier ' + r.tier + ' · ' + TIER_NAMES[r.tier] }),
-          h('h2', { text: g }),
-          h('p', { text: r.attrs })
-        ]),
-        h('button', { class: 'rm', type: 'button', 'aria-label': 'Remover ' + g, text: 'Remover', onclick: function () { toggleGoal(g); } })
+        h('span', { class: 'pill', text: tierLabel(r) }),
+        h('h2', { text: g }),
+        h('p', { text: r.attrs })
       ]);
     }));
     return h('section', { class: 'panel goal', 'aria-label': 'Livros escolhidos' }, [
@@ -577,24 +648,25 @@ if (typeof module !== 'undefined' && module.exports) {
     ]);
   }
 
-  function tilesPanel() {
+  function tnavPanel() {
+    var box = $('tnav');
+    box.textContent = '';
     tierRefs = {};
-    var box = h('section', { class: 'tiles', 'aria-label': 'Resumo por tier' });
-    tiersPresent().forEach(function (t) {
+    var ts = tiersPresent();
+    if (!ts.length) return;
+    box.appendChild(h('div', { class: 'sb-h', text: 'Progresso por tier' }));
+    ts.forEach(function (t) {
       var bar = h('i');
-      var done = h('div', { class: 'td num' });
+      var done = h('span', { class: 'tdn num' });
       tierRefs[t] = { done: done, bar: bar, total: data.byTier[t] };
       box.appendChild(h('button', {
-        class: 't' + t + ' tile', type: 'button',
+        class: 'tn-row t' + t, type: 'button',
         onclick: function () { var el = $('tier-' + t); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       }, [
-        h('span', { class: 'tn', text: 'Tier ' + t + ' · ' + TIER_NAMES[t] }),
-        h('span', { class: 'tc num', text: String(data.byTier[t]) }),
-        h('div', { class: 'bar' }, [bar]),
-        done
+        h('span', { class: 'tn-top' }, [h('i', { class: 'dot' }), h('span', { text: 'T' + t + ' · ' + TIER_NAMES[t] }), done]),
+        h('div', { class: 'bar' }, [bar])
       ]));
     });
-    return box;
   }
 
   function matsPanel() {
@@ -618,29 +690,45 @@ if (typeof module !== 'undefined' && module.exports) {
     var minus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Diminuir ' + name, text: '−' });
     var plus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Aumentar ' + name, text: '+' });
     var all = h('button', { class: 'cbtn all', type: 'button', 'aria-label': 'Marcar todos de ' + name + ' como feitos', text: 'Todos' });
-    var status = h('span', { class: 'status' });
+    var rows = {};
+    var recipeList = r.ing ? h('ul', { class: 'recipe', 'aria-label': 'Ingredientes de ' + name }, r.ing.map(function (i) {
+      var cnt = h('span', { class: 'rc num' });
+      var rfill = h('i');
+      var bar = h('div', { class: 'rbar' }, [rfill]);
+      var li = h('li', { class: 't' + RECIPES[i].tier }, [
+        h('div', { class: 'ri' }, [h('span', { class: 'rn', text: '1x ' + i }), cnt]),
+        bar
+      ]);
+      rows[i] = { cnt: cnt, fill: rfill, li: li };
+      return li;
+    })) : null;
+    var ready = r.ing ? h('p', { class: 'ready' }) : null;
+    var stock = parents.length ? h('p', { class: 'stock' }) : null;
     var pctEl = h('span', { class: 'pct num' });
     var fill = h('i');
     var pbar = h('div', { class: 'pbar', role: 'progressbar', 'aria-label': 'Progresso de ' + name, 'aria-valuemin': '0', 'aria-valuemax': '100' }, [fill]);
     var card = h('article', { class: 'card s-none t' + t }, [
-      h('div', { class: 'card-top' }, [h('h3', { text: name }), h('span', { class: 'qty num', text: need + 'x' })]),
-      h('p', { class: 'attrs', text: r.attrs }),
-      r.ing ? h('ul', { class: 'recipe', 'aria-label': 'Ingredientes de ' + name }, r.ing.map(function (i) {
-        return h('li', { class: 't' + RECIPES[i].tier }, [h('span', { class: 'num', text: '1x' }), h('span', { text: i }), h('span', { class: 'it', text: 'T' + RECIPES[i].tier })]);
-      })) : null,
-      parents.length ? h('p', { class: 'uses', text: 'Entra em: ' + parents.join(', ') }) : null,
-      h('div', { class: 'card-foot' }, [h('span', { class: 'lbl', text: 'Feitos' }), h('div', { class: 'counter' }, [minus, val, plus, all])]),
-      h('div', { class: 'prog' }, [h('div', { class: 'prog-head' }, [status, pctEl]), pbar])
+      h('div', { class: 'c-top' }, [
+        icon(name, 40),
+        h('div', { class: 'c-id' }, [h('h3', { text: name }), h('p', { class: 'attrs', text: r.attrs })]),
+        h('span', { class: 'qty num', title: 'Quantidade necessária', text: need + 'x' })
+      ]),
+      recipeList,
+      ready,
+      parents.length ? h('p', { class: 'attrs', text: 'Entra em: ' + parents.join(', ') }) : null,
+      stock,
+      h('div', { class: 'c-foot' }, [h('div', { class: 'counter' }, [minus, val, plus, all]), pctEl]),
+      pbar
     ]);
     minus.addEventListener('click', function () { setProg(name, Math.max(0, getProg(name) - 1)); refresh(); });
     plus.addEventListener('click', function () { setProg(name, Math.min(need, getProg(name) + 1)); refresh(); });
     all.addEventListener('click', function () { setProg(name, need); refresh(); });
-    cards[name] = { el: card, val: val, minus: minus, plus: plus, need: need, tier: t, status: status, pct: pctEl, fill: fill, pbar: pbar };
+    cards[name] = { el: card, val: val, minus: minus, plus: plus, need: need, tier: t, pct: pctEl, fill: fill, pbar: pbar, rows: rows, ready: ready, stock: stock, parents: parents };
     return card;
   }
 
   function tierSections() {
-    var wrap = h('div', { class: 'wrap', style: 'gap:28px' });
+    var wrap = h('div', { class: 'stack' });
     legendRefs = {};
     var legend = h('div', { class: 'legend', role: 'group', 'aria-label': 'Legenda das cores dos cartões' });
     [['done', 'Completo'], ['prog', 'Em andamento'], ['none', 'Não iniciado']].forEach(function (s) {
@@ -649,6 +737,10 @@ if (typeof module !== 'undefined' && module.exports) {
       legend.appendChild(h('span', { class: 'lg s-' + s[0] }, [h('i', { class: 'dot' }), h('span', { text: s[1] }), n]));
     });
     wrap.appendChild(legend);
+    wrap.appendChild(h('details', { class: 'how' }, [
+      h('summary', { text: 'Como funcionam as barrinhas das receitas' }),
+      h('p', { text: 'Dentro de cada receita, a barrinha mostra quanto do seu estoque já cobre aquele livro. O estoque é o que você fez menos o que já gastou nos livros de cima. Um mesmo livro pode aparecer em várias receitas e conta inteiro em cada uma, então confira o estoque antes de forjar.' })
+    ]));
     tiersPresent().forEach(function (t) {
       var names = namesOfTier(t);
       var done = h('span', { class: 'sec-meta num' });
@@ -708,8 +800,7 @@ if (typeof module !== 'undefined' && module.exports) {
         ul.appendChild(li);
       });
       grid.appendChild(h('article', { class: 'card t8' }, [
-        h('div', { class: 'card-top' }, [h('h3', { text: g }), h('span', { class: 'pill', text: r.group })]),
-        h('p', { class: 'attrs', text: r.attrs }),
+        h('div', { class: 'c-top' }, [icon(g, 40), h('div', { class: 'c-id' }, [h('h3', { text: g }), h('p', { class: 'attrs', text: r.attrs })]), h('span', { class: 'pill', text: r.group })]),
         ul
       ]));
     });
@@ -751,14 +842,14 @@ if (typeof module !== 'undefined' && module.exports) {
     box.textContent = '';
     cards = {}; tierRefs = {}; sumRefs = null;
     if (!state.goals.length) {
-      box.appendChild(h('div', { class: 'panel' }, [h('h2', { text: 'Nenhum livro escolhido' }), h('p', { class: 'sec-desc', text: 'Toque em um livro acima para ver a árvore, as quantidades e marcar o progresso. Você pode escolher vários ao mesmo tempo.' })]));
+      $('tnav').textContent = '';
+      box.appendChild(h('div', { class: 'panel' }, [h('h2', { text: 'Nenhum livro escolhido' }), h('p', { class: 'sec-desc', text: 'Escolha um livro no menu à esquerda para ver a árvore, as quantidades e marcar o progresso. Você pode escolher vários ao mesmo tempo.' })]));
       return;
     }
     data = tally(state.goals);
-    var wrap = h('div', { class: 'wrap', style: 'gap:22px' });
+    tnavPanel();
+    var wrap = h('div', { class: 'stack' });
     wrap.appendChild(goalPanel());
-    var tiles = tilesPanel();
-    if (tiles.children.length) wrap.appendChild(tiles);
     var mats = matsPanel();
     if (mats) wrap.appendChild(mats);
     wrap.appendChild(tierSections());
@@ -774,6 +865,38 @@ if (typeof module !== 'undefined' && module.exports) {
     if (!sumRefs) return;
     var doneBy = {};
     var counts = { done: 0, prog: 0, none: 0 };
+    /* Estoque de cada livro = quantos você fez menos os que já foram gastos nos livros de cima. */
+    var made = {}, used = {}, stockOf = {};
+    Object.keys(cards).forEach(function (n) { made[n] = Math.min(getProg(n), cards[n].need); });
+    Object.keys(cards).forEach(function (p) {
+      (RECIPES[p].ing || []).forEach(function (x) { used[x] = (used[x] || 0) + made[p]; });
+    });
+    Object.keys(cards).forEach(function (n) { stockOf[n] = Math.max(0, made[n] - (used[n] || 0)); });
+    Object.keys(cards).forEach(function (n) {
+      var c = cards[n];
+      if (c.stock) {
+        var u = used[n] || 0;
+        c.stock.textContent = 'Em estoque: ' + stockOf[n] + (u > 0 ? ' · ' + u + ' já usados' : '');
+      }
+      if (!c.ready) return;
+      var R = c.need - made[n];
+      var can = R;
+      var missing = [];
+      Object.keys(c.rows).forEach(function (x) {
+        var row = c.rows[x];
+        var req = R, cover = Math.min(stockOf[x], req);
+        var fr = req > 0 ? (cover / req) * 100 : 100;
+        row.cnt.textContent = req > 0 ? cover + '/' + req : '✓';
+        row.fill.style.width = fr + '%';
+        row.li.style.setProperty('--h', hueFor(fr).toFixed(1));
+        can = Math.min(can, stockOf[x]);
+        if (stockOf[x] === 0) missing.push(x);
+      });
+      c.ready.className = 'ready';
+      if (R <= 0) { c.ready.textContent = 'Livro completo'; c.ready.classList.add('fin'); }
+      else if (can > 0) { c.ready.textContent = 'Dá para forjar agora: ' + can + ' de ' + R; c.ready.classList.add('go'); }
+      else { c.ready.textContent = 'Falta: ' + missing.join(', '); }
+    });
     Object.keys(cards).forEach(function (n) {
       var c = cards[n], v = Math.min(getProg(n), c.need);
       doneBy[c.tier] = (doneBy[c.tier] || 0) + v;
@@ -782,10 +905,7 @@ if (typeof module !== 'undefined' && module.exports) {
       counts[st]++;
       c.el.classList.remove('s-done', 's-prog', 's-none');
       c.el.classList.add('s-' + st);
-      var frac = (v / c.need) * 100;
-      var hue = frac <= 50 ? 4 + (frac / 50) * 42 : 46 + ((frac - 50) / 50) * 94;
-      c.el.style.setProperty('--h', hue.toFixed(1));
-      c.status.textContent = STATUS[st];
+      c.el.style.setProperty('--h', hueFor((v / c.need) * 100).toFixed(1));
       var p = Math.round((v / c.need) * 100);
       c.pct.textContent = p + '%';
       c.fill.style.width = p + '%';
@@ -801,7 +921,7 @@ if (typeof module !== 'undefined' && module.exports) {
       var pct = tot ? (d / tot) * 100 : 0;
       ref.bar.style.width = pct + '%';
       ref.hdrBar.style.width = pct + '%';
-      ref.done.textContent = d + ' de ' + tot + ' feitos';
+      ref.done.textContent = d + '/' + tot;
       ref.hdrDone.textContent = d + ' de ' + tot + ' feitos';
     });
     var pctAll = total ? Math.round((done / total) * 100) : 0;
@@ -819,8 +939,7 @@ if (typeof module !== 'undefined' && module.exports) {
   /* ---------- eventos ---------- */
   $('q').addEventListener('input', function (e) {
     query = e.target.value;
-    renderCats();
-    renderPicks();
+    renderBooks();
   });
 
   var resetBtn = $('reset'), resetTimer = null;
@@ -839,11 +958,11 @@ if (typeof module !== 'undefined' && module.exports) {
     renderResults();
   });
 
-  renderCats();
-  renderPicks();
+  renderMine();
+  renderBooks();
   renderResults();
 })();
-</script>
 
+</script>
 </body>
 </html>
