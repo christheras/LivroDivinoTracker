@@ -243,6 +243,10 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
 .credit { text-align: center; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
 .credit b { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--accent); letter-spacing: .02em; }
 
+.totop { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font-size: 20px; line-height: 1; display: grid; place-items: center; opacity: 0; pointer-events: none; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,.18); }
+.totop.show { opacity: .5; pointer-events: auto; }
+.totop.show:hover, .totop.show:focus-visible { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) { .totop { transition: opacity .2s ease; } }
 @media (max-width: 900px) {
   .app { grid-template-columns: minmax(0, 1fr); }
   .side { position: static; max-height: none; overflow: visible; padding: 0; }
@@ -285,24 +289,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
           <li><b>Livros do clã:</b> Livraria do Marechal, no Laboratório de Alquimia da Base Clã (nível IV em diante).</li>
         </ul>
       </div>
-      <div class="panel">
-        <h2>Notas sobre a wiki</h2>
-        <ul>
-          <li>Alguns nomes aparecem diferentes nas receitas da wiki. Padronizei: "Sorriso da Natureza" é o Sorriso da Flora, "Rose's Thorn" é Espinhos de Rosa e "Renascido nas Chamas" é Renascido das Chamas.</li>
-          <li>Na receita de Ao Sul dos Rios a wiki mostra "Decaying Tome". Usei Aniquilação, que bate com o custo de 45 fragmentos da própria wiki.</li>
-          <li>Conferi a receita de cada livro com os fragmentos que a wiki lista e todos batem.</li>
-          <li>A wiki é de 2021. Se a fornalha pedir algo diferente na 1.4.4, confie na fornalha.</li>
-        </ul>
-      </div>
-      <div class="panel">
-        <h2>Ícones dos livros</h2>
-        <ul>
-          <li>Cada livro lê a imagem <code>icons/nome-do-livro.png</code>, na mesma pasta desta página.</li>
-          <li>Sem a imagem, aparece a sigla do livro na cor do tier.</li>
-          <li>O nome do arquivo é o nome do livro em minúsculas, sem acento e com hífens. Exemplo: <code>chuva-de-petalas.png</code>.</li>
-          <li>Tamanho recomendado: 64×64 pixels, PNG.</li>
-        </ul>
-      </div>
     </section>
 
     <footer class="foot">
@@ -313,6 +299,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
     <p class="credit">Feito por <b>Heras</b>, junto com o Claude.</p>
   </main>
 </div>
+<button class="totop" id="totop" type="button" aria-label="Voltar ao topo">&#8593;</button>
 
 <script>
 var TIER_NAMES = { 1: 'Iniciante', 2: 'Aprendiz', 3: 'Discípulo', 4: 'Especialista', 5: 'Mestre', 6: 'Grão-Mestre', 7: 'Enciclopedista' };
@@ -957,6 +944,15 @@ if (typeof module !== 'undefined' && module.exports) {
     restoreReset();
     renderResults();
   });
+
+  var topBtn = $('totop');
+  function onScroll() { topBtn.classList.toggle('show', window.scrollY > 500); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  topBtn.addEventListener('click', function () {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
+  onScroll();
 
   renderMine();
   renderBooks();
