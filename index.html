@@ -13,6 +13,7 @@
   --bg: #EDF1EF; --surface: #FFFFFF; --surface2: #F5F8F6;
   --fg: #15211E; --muted: #4F5F5A; --line: #CFD9D5;
   --accent: #0B6B55; --on-accent: #FFFFFF; --danger: #B3362B;
+  --cs: 70%; --cl: 45%; --ts: 80%; --tl: 26%; --bs: 85%; --bl: 91%; --brs: 65%; --brl: 50%;
   --t1: #4C5A62; --t1bg: #E3E8EB;
   --t2: #0B6B55; --t2bg: #D8EFE6;
   --t3: #1D58A3; --t3bg: #DCE9F8;
@@ -29,6 +30,7 @@
     --bg: #0D1412; --surface: #151F1C; --surface2: #1A2623;
     --fg: #E5EEEB; --muted: #98AAA4; --line: #28372F;
     --accent: #4CC9A0; --on-accent: #06241A; --danger: #F08A80;
+    --cs: 65%; --cl: 48%; --ts: 75%; --tl: 72%; --bs: 45%; --bl: 14%; --brs: 55%; --brl: 40%;
     --t1: #B3C0C7; --t1bg: #212C31;
     --t2: #5DD3AA; --t2bg: #12342A;
     --t3: #86B8F2; --t3bg: #162A42;
@@ -43,6 +45,7 @@
   --bg: #0D1412; --surface: #151F1C; --surface2: #1A2623;
   --fg: #E5EEEB; --muted: #98AAA4; --line: #28372F;
   --accent: #4CC9A0; --on-accent: #06241A; --danger: #F08A80;
+  --cs: 65%; --cl: 48%; --ts: 75%; --tl: 72%; --bs: 45%; --bl: 14%; --brs: 55%; --brl: 40%;
   --t1: #B3C0C7; --t1bg: #212C31;
   --t2: #5DD3AA; --t2bg: #12342A;
   --t3: #86B8F2; --t3bg: #162A42;
@@ -137,7 +140,31 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
 .sec-desc { color: var(--muted); max-width: 72ch; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: 12px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.card.done { border-color: var(--accent); background: var(--surface2); }
+/* A cor de cada cartão vem do matiz --h: 4 (vermelho) em 0%, 46 (amarelo) em 50%, 140 (verde) em 100%.
+   O JavaScript ajusta --h em cada cartão. As classes abaixo são o valor inicial e a cor da legenda. */
+@property --h { syntax: '<number>'; inherits: true; initial-value: 4; }
+.s-none { --h: 4; }
+.s-prog { --h: 46; }
+.s-done { --h: 140; }
+.s-none, .s-prog, .s-done {
+  --sc: hsl(var(--h) var(--cs) var(--cl));
+  --st: hsl(var(--h) var(--ts) var(--tl));
+  --sbg: hsl(var(--h) var(--bs) var(--bl));
+  --sb: hsl(var(--h) var(--brs) var(--brl));
+}
+@media (prefers-reduced-motion: no-preference) { .card.s-none, .card.s-prog, .card.s-done { transition: --h .35s ease; } }
+.card.s-done, .card.s-prog, .card.s-none { background: var(--sbg); border-color: var(--sb); }
+.prog { display: flex; flex-direction: column; gap: 6px; }
+.prog-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--st); }
+.status { display: inline-flex; align-items: center; gap: 7px; }
+.status::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--sc); flex: none; }
+.pct { font-size: 14px; }
+.pbar { height: 10px; border-radius: 99px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
+.pbar i { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--sc); }
+@media (prefers-reduced-motion: no-preference) { .pbar i { transition: width .25s ease; } }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; }
+.lg { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--sb); background: var(--sbg); color: var(--st); border-radius: 99px; padding: 4px 12px; font-size: 13px; font-weight: 600; }
+.lg .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--sc); }
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .card-top h3 { min-width: 0; overflow-wrap: anywhere; }
 .qty { font-size: 24px; line-height: 1; color: var(--c); background: var(--cbg); padding: 5px 9px; border-radius: 6px; white-space: nowrap; }
@@ -155,7 +182,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
 .cbtn:hover:not(:disabled) { border-color: var(--accent); }
 .cbtn:disabled { opacity: .35; cursor: default; }
 .cbtn.all { font-size: 14px; width: auto; padding: 0 10px; font-weight: 600; }
-.card.done .val { color: var(--accent); }
 
 .reqs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .reqs li { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 8px; }
@@ -520,7 +546,8 @@ if (typeof module !== 'undefined' && module.exports) {
   }
 
   /* ---------- resultados ---------- */
-  var data, cards, tierRefs, sumRefs, reqRefs;
+  var data, cards, tierRefs, sumRefs, reqRefs, legendRefs;
+  var STATUS = { done: 'Completo', prog: 'Em andamento', none: 'Não iniciado' };
 
   function tiersPresent() {
     return [1, 2, 3, 4, 5, 6, 7].filter(function (t) { return data.byTier[t] > 0; });
@@ -591,24 +618,37 @@ if (typeof module !== 'undefined' && module.exports) {
     var minus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Diminuir ' + name, text: '−' });
     var plus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Aumentar ' + name, text: '+' });
     var all = h('button', { class: 'cbtn all', type: 'button', 'aria-label': 'Marcar todos de ' + name + ' como feitos', text: 'Todos' });
-    var card = h('article', { class: 'card t' + t }, [
+    var status = h('span', { class: 'status' });
+    var pctEl = h('span', { class: 'pct num' });
+    var fill = h('i');
+    var pbar = h('div', { class: 'pbar', role: 'progressbar', 'aria-label': 'Progresso de ' + name, 'aria-valuemin': '0', 'aria-valuemax': '100' }, [fill]);
+    var card = h('article', { class: 'card s-none t' + t }, [
       h('div', { class: 'card-top' }, [h('h3', { text: name }), h('span', { class: 'qty num', text: need + 'x' })]),
       h('p', { class: 'attrs', text: r.attrs }),
       r.ing ? h('ul', { class: 'recipe', 'aria-label': 'Ingredientes de ' + name }, r.ing.map(function (i) {
         return h('li', { class: 't' + RECIPES[i].tier }, [h('span', { class: 'num', text: '1x' }), h('span', { text: i }), h('span', { class: 'it', text: 'T' + RECIPES[i].tier })]);
       })) : null,
       parents.length ? h('p', { class: 'uses', text: 'Entra em: ' + parents.join(', ') }) : null,
-      h('div', { class: 'card-foot' }, [h('span', { class: 'lbl', text: 'Feitos' }), h('div', { class: 'counter' }, [minus, val, plus, all])])
+      h('div', { class: 'card-foot' }, [h('span', { class: 'lbl', text: 'Feitos' }), h('div', { class: 'counter' }, [minus, val, plus, all])]),
+      h('div', { class: 'prog' }, [h('div', { class: 'prog-head' }, [status, pctEl]), pbar])
     ]);
     minus.addEventListener('click', function () { setProg(name, Math.max(0, getProg(name) - 1)); refresh(); });
     plus.addEventListener('click', function () { setProg(name, Math.min(need, getProg(name) + 1)); refresh(); });
     all.addEventListener('click', function () { setProg(name, need); refresh(); });
-    cards[name] = { el: card, val: val, minus: minus, plus: plus, need: need, tier: t };
+    cards[name] = { el: card, val: val, minus: minus, plus: plus, need: need, tier: t, status: status, pct: pctEl, fill: fill, pbar: pbar };
     return card;
   }
 
   function tierSections() {
     var wrap = h('div', { class: 'wrap', style: 'gap:28px' });
+    legendRefs = {};
+    var legend = h('div', { class: 'legend', role: 'group', 'aria-label': 'Legenda das cores dos cartões' });
+    [['done', 'Completo'], ['prog', 'Em andamento'], ['none', 'Não iniciado']].forEach(function (s) {
+      var n = h('b', { class: 'num', text: '0' });
+      legendRefs[s[0]] = n;
+      legend.appendChild(h('span', { class: 'lg s-' + s[0] }, [h('i', { class: 'dot' }), h('span', { text: s[1] }), n]));
+    });
+    wrap.appendChild(legend);
     tiersPresent().forEach(function (t) {
       var names = namesOfTier(t);
       var done = h('span', { class: 'sec-meta num' });
@@ -733,14 +773,27 @@ if (typeof module !== 'undefined' && module.exports) {
   function refresh() {
     if (!sumRefs) return;
     var doneBy = {};
+    var counts = { done: 0, prog: 0, none: 0 };
     Object.keys(cards).forEach(function (n) {
       var c = cards[n], v = Math.min(getProg(n), c.need);
       doneBy[c.tier] = (doneBy[c.tier] || 0) + v;
       c.val.textContent = v + '/' + c.need;
-      c.el.classList.toggle('done', v >= c.need);
+      var st = v >= c.need ? 'done' : (v > 0 ? 'prog' : 'none');
+      counts[st]++;
+      c.el.classList.remove('s-done', 's-prog', 's-none');
+      c.el.classList.add('s-' + st);
+      var frac = (v / c.need) * 100;
+      var hue = frac <= 50 ? 4 + (frac / 50) * 42 : 46 + ((frac - 50) / 50) * 94;
+      c.el.style.setProperty('--h', hue.toFixed(1));
+      c.status.textContent = STATUS[st];
+      var p = Math.round((v / c.need) * 100);
+      c.pct.textContent = p + '%';
+      c.fill.style.width = p + '%';
+      c.pbar.setAttribute('aria-valuenow', String(p));
       c.minus.disabled = v <= 0;
       c.plus.disabled = v >= c.need;
     });
+    if (legendRefs) Object.keys(counts).forEach(function (k) { if (legendRefs[k]) legendRefs[k].textContent = String(counts[k]); });
     var total = 0, done = 0;
     Object.keys(tierRefs).forEach(function (t) {
       var ref = tierRefs[t], tot = ref.total, d = doneBy[t] || 0;
