@@ -10,3 +10,5 @@ atualização 01/11/2026 - v0.3
 Reformulação do layout do tracker e inicio de implementação das imagens dos livros
  Acrescentado mais informações na hora de forjar os livros 
    Barra indicando quais livros de tier posteriores ja possuem materiais necessarios para forja
+atualização 02/11/2026 - v0.5
+ Implementação dos icones dos livros
