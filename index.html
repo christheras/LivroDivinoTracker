@@ -501,9 +501,9 @@ if (typeof module !== 'undefined' && module.exports) {
 
 (function () {
   var CATS = [
+    { id: 'enc', tier: 7, label: 'Enciclopedista', test: function (r) { return r.tier === 7; } },
     { id: 'gm', tier: 6, label: 'Grão-Mestre', test: function (r) { return r.tier === 6; } },
     { id: 'm', tier: 5, label: 'Mestre', test: function (r) { return r.tier === 5; } },
-    { id: 'enc', tier: 7, label: 'Enciclopedista', test: function (r) { return r.tier === 7; } },
     { id: 'esp', tier: 4, label: 'Especialista', test: function (r) { return r.tier === 4; } },
     { id: 'disc', tier: 3, label: 'Discípulo', test: function (r) { return r.tier === 3; } },
     { id: 'apr', tier: 2, label: 'Aprendiz', test: function (r) { return r.tier === 2; } },
