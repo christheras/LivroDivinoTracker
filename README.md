@@ -1,4 +1,6 @@
 Crédito: https://www.youtube.com/@christheras
+
+
 Tracker para Forja de Livros divinos. 
 Claude foi utilizado na criação
 Não foi possivel utilizar as imagens dos livros para facilitar a visualização, pois possuem copyright.
@@ -26,3 +28,19 @@ Melhorias visuais
 
 Ingrediente pronto em verde forte: quando você já tem todo o material de um ingrediente, a linha inteira fica verde, com texto branco, para ficar fácil de ver.
 Roxo azulado quando dá para forjar: quando você tem material dos 3 ingredientes de um livro, as 3 linhas ficam roxo azulado, junto com o aviso “Dá para forjar agora”.
+
+Patch notes: Rastreador de Livros Divinos (v0.9)
+
+Novidades
+
+Preço dos materiais: novo quadro no menu à esquerda, logo abaixo do “Buscar livro”. Informe o preço do Fragmento de Escrita Divina e do Livro em Branco Divino, e o tracker calcula o gasto previsto da árvore inteira e quanto ainda falta gastar. Os preços ficam salvos no navegador e funcionam mesmo sem nenhum livro escolhido.
+Ícones dos materiais: o fragmento e o livro em branco agora têm ícone nos cartões de quantidade e nos campos de preço. Os arquivos ficam em icons/fragmento-de-escrita-divina.png e icons/livro-em-branco-divino.png.
+Preenchimento automático: ao marcar um livro avançado que você já tem, os livros usados nele são marcados como feitos automaticamente, até o Tier 1. O que você já tinha em estoque é usado em vez de duplicado.
+Tier em cada categoria: antes de abrir cada categoria, o menu mostra o tier na frente do nome (por exemplo T6 Grão-Mestre, T5 Mestre), para quem conhece o livro só pelo nível.
+Tier na frente de cada livro na lista do menu e nos resultados da busca.
+
+Melhorias visuais
+
+Quadro de preços com cores invertidas: fica escuro no modo claro e claro no modo escuro, para sempre se destacar no menu. O valor total em moedas aparece em amarelo.
+Barras em blocos: a barra de cada cartão e as barras dos ingredientes são divididas em blocos, um por livro.
+Cores dos ingredientes: verde forte quando o material está pronto e roxo azulado quando dá para forjar o próximo tier.
