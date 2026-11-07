@@ -1,12 +1,312 @@
 <!doctype html>
-<!-- © 2026 Heras (youtube.com/@christheras). Todos os direitos reservados. -->
+<!--
+  Rastreador de Livros Divinos (Perfect World)
+  Copyright (C) 2026 Heras (https://www.youtube.com/@christheras), feito junto com o Claude.
+
+  Este programa é software livre: você pode redistribuí-lo e/ou modificá-lo
+  sob os termos da Licença Pública Geral GNU, versão 3, publicada pela
+  Free Software Foundation.
+
+  Este programa é distribuído na esperança de que seja útil, mas SEM
+  NENHUMA GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou
+  ADEQUAÇÃO A UM PROPÓSITO PARTICULAR. Veja a Licença Pública Geral GNU
+  para mais detalhes: https://www.gnu.org/licenses/gpl-3.0.html
+  Código-fonte: https://github.com/christheras/LivroDivinoTracker
+-->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rastreador de Livros Divinos</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
-<style>:root{--bg:#EDF1EF;--surface:#FFFFFF;--surface2:#F5F8F6;--fg:#15211E;--muted:#4F5F5A;--line:#CFD9D5;--accent:#0B6B55;--on-accent:#FFFFFF;--danger:#B3362B;--cs:70%;--cl:45%;--ts:80%;--tl:26%;--bs:85%;--bl:91%;--brs:65%;--brl:50%;--okbg:#1F9D55;--okfg:#FFFFFF;--okbd:#14783E;--xbg:#15211E;--xfg:#E5EEEB;--xmuted:#98AAA4;--xline:#2D4239;--xinp:#1F2D29;--xyel:#F4C74F;--fgbg:#4B49C9;--fgfg:#FFFFFF;--fgbd:#3533A0;--t1:#4C5A62;--t1bg:#E3E8EB;--t2:#0B6B55;--t2bg:#D8EFE6;--t3:#1D58A3;--t3bg:#DCE9F8;--t4:#6A3C9E;--t4bg:#EBE0F7;--t5:#8A5200;--t5bg:#F8E8C6;--t6:#A3243B;--t6bg:#F9DDE2;--t7:#912C80;--t7bg:#F4DCF0;--font-display:'Marcellus', 'Palatino Linotype', Georgia, serif;--font-body:'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;--font-mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace}@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0D1412;--surface:#151F1C;--surface2:#1A2623;--fg:#E5EEEB;--muted:#98AAA4;--line:#28372F;--accent:#4CC9A0;--on-accent:#06241A;--danger:#F08A80;--cs:65%;--cl:48%;--ts:75%;--tl:72%;--bs:45%;--bl:14%;--brs:55%;--brl:40%;--okbg:#1F9D55;--okfg:#FFFFFF;--okbd:#5FE39A;--xbg:#FFFFFF;--xfg:#15211E;--xmuted:#4F5F5A;--xline:#CFD9D5;--xinp:#F5F8F6;--xyel:#9A6400;--fgbg:#4B49C9;--fgfg:#FFFFFF;--fgbd:#A9A7FF;--t1:#B3C0C7;--t1bg:#212C31;--t2:#5DD3AA;--t2bg:#12342A;--t3:#86B8F2;--t3bg:#162A42;--t4:#C4A3F2;--t4bg:#2A1D40;--t5:#F2BA56;--t5bg:#3A2B0E;--t6:#F29AAA;--t6bg:#41202A;--t7:#E6A0DA;--t7bg:#3A1F36;color-scheme:dark}}:root[data-theme=dark]{--bg:#0D1412;--surface:#151F1C;--surface2:#1A2623;--fg:#E5EEEB;--muted:#98AAA4;--line:#28372F;--accent:#4CC9A0;--on-accent:#06241A;--danger:#F08A80;--cs:65%;--cl:48%;--ts:75%;--tl:72%;--bs:45%;--bl:14%;--brs:55%;--brl:40%;--okbg:#1F9D55;--okfg:#FFFFFF;--okbd:#5FE39A;--xbg:#FFFFFF;--xfg:#15211E;--xmuted:#4F5F5A;--xline:#CFD9D5;--xinp:#F5F8F6;--xyel:#9A6400;--fgbg:#4B49C9;--fgfg:#FFFFFF;--fgbd:#A9A7FF;--t1:#B3C0C7;--t1bg:#212C31;--t2:#5DD3AA;--t2bg:#12342A;--t3:#86B8F2;--t3bg:#162A42;--t4:#C4A3F2;--t4bg:#2A1D40;--t5:#F2BA56;--t5bg:#3A2B0E;--t6:#F29AAA;--t6bg:#41202A;--t7:#E6A0DA;--t7bg:#3A1F36;color-scheme:dark}*{box-sizing:border-box}body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.5;padding-block:18px 56px;padding-left:max(16px,env(safe-area-inset-left,0));padding-right:max(16px,env(safe-area-inset-right,0))}.t1,.t8{--c:var(--t1);--cbg:var(--t1bg)}.t2{--c:var(--t2);--cbg:var(--t2bg)}.t3{--c:var(--t3);--cbg:var(--t3bg)}.t4{--c:var(--t4);--cbg:var(--t4bg)}.t5{--c:var(--t5);--cbg:var(--t5bg)}.t6{--c:var(--t6);--cbg:var(--t6bg)}.t7{--c:var(--t7);--cbg:var(--t7bg)}h1,h2{font-family:var(--font-display);font-weight:400;margin:0}.eyebrow,h3{font-weight:600}h1,h2,h3{text-wrap:balance}h3{font-size:15px;line-height:1.25;font-family:var(--font-body)}h1{font-size:27px;line-height:1.1}h2{font-size:20px}h3,p{margin:0}.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}button,input{font:inherit;color:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.stack{display:flex;flex-direction:column;gap:18px;min-width:0}.app{display:grid;grid-template-columns:310px minmax(0,1fr);gap:26px;max-width:1440px;margin:0 auto;align-items:start}.side{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow-y:auto;gap:12px;padding:2px 6px 2px 2px;scrollbar-width:thin}.main,.sb,.side{display:flex;flex-direction:column}.main{gap:20px;min-width:0}.sb{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;gap:8px}.sb-h{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.goal-item p,.hint,.search label{color:var(--muted);font-size:13px}.search label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}.ico,.search input{border-radius:8px;border:1px solid var(--line)}.search input{background:var(--surface2);padding:9px 12px;min-height:40px;width:100%}.ico{position:relative;display:inline-grid;place-items:center;flex:none;width:var(--s, 32px);height:var(--s, 32px);background:var(--cbg);color:var(--c);overflow:hidden}.ico .ini{font-size:calc(var(--s, 32px)*.36);font-weight:700;letter-spacing:.02em}.ico img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.ico.has .ini{visibility:hidden}.mine-row{display:flex;align-items:center;gap:10px}.mine-row .mt{min-width:0;flex:1;display:flex;flex-direction:column}.mine-row .mt b{font-weight:600;overflow-wrap:anywhere;line-height:1.2}.mine-row .mt span{font-size:12px;color:var(--c)}.rm{border:1px solid var(--line);background:var(--surface2);border-radius:8px;width:32px;height:32px;font-size:18px;line-height:1;flex:none}.rm:hover{border-color:var(--danger);color:var(--danger)}.cat{border-top:1px solid var(--line);padding-top:6px}.cat:first-of-type{border-top:0;padding-top:0}.cat summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600;padding:6px 2px}.cat summary::-webkit-details-marker{display:none}.cat summary::before{content:"▸";margin-right:6px}.cat[open] summary::before,.tree details[open]>summary::before{content:"▾"}.cat summary .l{flex:1}.cat summary .n,.cat summary::before{font-size:12px;color:var(--muted)}.cat summary .s{background:var(--accent);color:var(--on-accent);border-radius:99px;padding:0 7px}.blist{display:flex;flex-direction:column;gap:2px;padding-bottom:6px}.cat summary .s,.grp{font-size:11px;font-weight:600}.grp{letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:6px 2px 2px}.brow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:5px 8px;border-radius:8px;border:1px solid transparent;background:0 0;position:relative}.brow:hover,.brow[aria-pressed=true],.pw input{background:var(--surface2)}.brow[aria-pressed=true]{border-color:var(--accent)}.brow[aria-pressed=true]::after{content:"✓";position:absolute;right:10px;color:var(--accent);font-weight:700}.brow .tg{flex:none;font-size:11px;font-weight:700;color:var(--c);background:var(--cbg);border-radius:6px;padding:1px 6px;min-width:28px;text-align:center}.brow .bn{min-width:0;flex:1;font-weight:500;line-height:1.2;overflow-wrap:anywhere;padding-right:18px}.brow .tb,.cat summary .tb{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--c);background:var(--cbg);border-radius:5px;padding:0 5px;margin-right:6px;vertical-align:1px}.sb.costs,.sb.costs .pw input{border-color:var(--xline);color:var(--xfg)}.sb.costs{gap:8px;background:var(--xbg)}.sb.costs .cu,.sb.costs .k,.sb.costs .r,.sb.costs .sb-h{color:var(--xmuted)}.sb.costs .pw input{background:var(--xinp)}.sb.costs .ico{--c:var(--xfg);--cbg:var(--xinp);border-color:var(--xline)}.sb.costs .cout{border-top-color:var(--xline)}.sb.costs .cout .v{color:var(--xyel);font-weight:600}.costs .k{color:var(--muted);font-size:12.5px}.cin{flex-direction:column;gap:8px}.cin,.pin,.pw{display:flex}.pin{flex-direction:column;gap:3px}.pw{align-items:center;gap:8px}.pw input{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-height:38px;font-family:var(--font-mono);text-align:right}.cu{color:var(--muted);font-size:12.5px}.cout{border-top:1px solid var(--line);padding-top:8px}.cout .v{font-size:20px;overflow-wrap:anywhere;line-height:1.2;color:var(--accent)}.cout .r,.none{color:var(--muted)}.cout .r{font-size:12.5px}.brow .bt{font-size:11px;font-weight:600;color:var(--c)}.none{padding:6px 2px}.tn-row{display:flex;flex-direction:column;gap:4px;text-align:left;width:100%;background:0 0;border:0;border-radius:8px;padding:6px 4px}.tn-row:hover{background:var(--surface2)}.tn-top{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}.tn-top .dot{width:10px;height:10px;border-radius:3px;background:var(--c);flex:none}.tn-top .tdn{margin-left:auto;font-size:12px;color:var(--muted)}.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}.goal{display:grid;grid-template-columns:1fr minmax(170px,230px);gap:14px 24px;align-items:center}.goal-list,.overall{display:flex;flex-direction:column}.goal-list{gap:10px;min-width:0}.goal-item h2{font-size:22px;margin-top:2px}.overall{gap:6px}.overall .big{font-size:30px;line-height:1}.overall .lbl{color:var(--muted);font-size:12.5px}.bar,.pill{border-radius:99px}.pill{display:inline-block;background:var(--cbg);color:var(--c);padding:1px 9px;font-size:11.5px;font-weight:600;letter-spacing:.04em}.bar{height:8px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--c, var(--accent))}@media (prefers-reduced-motion:no-preference){.bar i{transition:width .25s ease}}.mats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.mat{padding:10px 14px}.legend,.mi{display:flex;align-items:center;gap:12px}.ico.tm{--c:var(--accent);--cbg:var(--surface2)}.mat .k{color:var(--muted);font-size:12.5px}.mat .v{font-size:22px;line-height:1.2}.mat .r{font-size:12px;color:var(--muted)}.legend{flex-wrap:wrap;gap:8px}.how,.lg{font-size:12.5px}.lg{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--sb);background:var(--sbg);color:var(--st);border-radius:99px;padding:3px 11px;font-weight:600}.lg .dot{width:9px;height:9px;border-radius:50%;background:var(--sc)}.how{color:var(--muted);max-width:80ch}.how summary{cursor:pointer;font-weight:600}@property --h{syntax:"<number>";inherits:true;initial-value:4}.s-none{--h:4}.s-prog{--h:46}.s-done{--h:140}.s-done,.s-none,.s-prog{--sc:hsl(var(--h) var(--cs) var(--cl));--st:hsl(var(--h) var(--ts) var(--tl));--sbg:hsl(var(--h) var(--bs) var(--bl));--sb:hsl(var(--h) var(--brs) var(--brl))}@media (prefers-reduced-motion:no-preference){.card.s-done,.card.s-none,.card.s-prog{transition:--h .35s ease}}.tier-sec{display:flex;flex-direction:column;gap:10px;scroll-margin-top:14px}.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}.recipe li .ri,.sec-title{display:flex;align-items:center}.sec-title{gap:10px;flex-wrap:wrap}.sec-desc,.sec-meta{color:var(--muted);font-size:12.5px}.sec-desc{max-width:76ch;font-size:13px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:10px}.card,.rbar i{min-width:0;background:var(--surface);border:1px solid var(--line)}.card{border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}.card.s-done,.card.s-none,.card.s-prog{background:var(--sbg);border-color:var(--sb)}.c-top{display:flex;align-items:flex-start;gap:10px}.c-id{min-width:0;flex:1;display:flex;flex-direction:column;gap:1px}.c-id h3{overflow-wrap:anywhere}.attrs,.stock{color:var(--muted)}.attrs{font-size:12px;line-height:1.3}.stock{font-size:11.5px}.qty{font-size:17px;line-height:1;color:var(--c);background:var(--cbg);padding:4px 7px;border-radius:6px;white-space:nowrap}.recipe,.recipe li{display:flex;flex-direction:column;gap:3px}.recipe{list-style:none;margin:0;padding:0}.recipe li{font-size:12.5px;background:var(--cbg);color:var(--c);border-radius:6px;padding:4px 7px 5px;--h:4}.recipe li .ri{gap:7px}.recipe li .rn{min-width:0;flex:1;overflow-wrap:anywhere;line-height:1.2}.recipe li .rc{font-size:12px;font-weight:600;color:hsl(var(--h) var(--ts) var(--tl));white-space:nowrap}.recipe li.ok{background:var(--okbg);color:var(--okfg);box-shadow:inset 0 0 0 1px var(--okbd)}.recipe li.ok .rc{color:var(--okfg);font-weight:700}.recipe li.forge{background:var(--fgbg);color:var(--fgfg);box-shadow:inset 0 0 0 1px var(--fgbd)}.recipe li.forge .rc{color:var(--fgfg);font-weight:700}.rbar{display:flex;gap:2px;height:7px}.rbar.dense{gap:1px}.rbar i{flex:1 1 0;border-radius:2px}.rbar i.on{background:hsl(var(--h) var(--cs) var(--cl));border-color:hsl(var(--h) var(--cs) var(--cl))}.recipe li.forge .rbar i,.recipe li.ok .rbar i{background:rgba(255,255,255,.25);border-color:transparent}.recipe li.forge .rbar i.on,.recipe li.ok .rbar i.on{background:#fff}@media (prefers-reduced-motion:no-preference){.rbar i{transition:background-color .2s ease}}.ready{font-size:12px;font-weight:600;border-radius:6px;padding:4px 8px}.ready.go{background:hsl(140 var(--bs) var(--bl));border:1px solid hsl(140 var(--brs) var(--brl));color:hsl(140 var(--ts) var(--tl))}.ready.fin{background:var(--surface2);border:1px solid var(--line);color:var(--muted)}.ready.fin::before,.ready.go::before{content:"✓"}.c-foot,.counter{align-items:center}.c-foot{display:flex;justify-content:space-between;gap:8px;margin-top:auto}.counter{display:inline-flex;gap:4px}.counter .val{min-width:46px;text-align:center;font-size:13px}.cbtn{width:30px;height:30px;border-radius:6px;border:1px solid var(--line);background:var(--surface);display:inline-grid;place-items:center;font-size:16px;line-height:1}.cbtn:hover:not(:disabled){border-color:var(--accent)}.cbtn:disabled{opacity:.35;cursor:default}.cbtn.all{font-size:12px;width:auto;padding:0 8px;font-weight:600}.pct{font-size:13px;font-weight:600;color:var(--st)}.pbar{display:flex;gap:2px;height:10px}.pbar.dense{gap:1px}.pbar i{flex:1 1 0;min-width:0;border-radius:3px;background:var(--surface);border:1px solid var(--line)}.pbar i.on{background:var(--sc);border-color:var(--sc)}.pbar.dense i{border-radius:2px}@media (prefers-reduced-motion:no-preference){.pbar i{transition:background-color .2s ease}}.reqs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.reqs li{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:6px}.reqs li:first-child{border-top:0;padding-top:0}.reqs .rl{min-width:0;overflow-wrap:anywhere}.reqs .rt{color:var(--muted)}.treebox{display:flex;flex-direction:column;gap:10px}.btns{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;font-weight:500;min-height:36px}.btn:hover{border-color:var(--accent)}.btn.danger{border-color:var(--danger);color:var(--danger)}.tree-root{display:flex;flex-direction:column;gap:14px}.tree{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;overflow-x:auto}.tree ul{list-style:none;padding-left:20px;border-left:1px solid var(--line);margin:0 0 0 10px}.tree>ul{border-left:0;padding-left:0;margin-left:0}.tree li{margin:2px 0}.tree summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:2px 0}.tree summary::-webkit-details-marker{display:none}.tree summary::before{content:"▸";color:var(--muted);font-size:12px;width:12px}.tree .leaf{padding:2px 0 2px 18px}.tn{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}.info code,.tn b{font-family:var(--font-mono)}.info li b,.tn b,.tn em{font-weight:600;color:var(--c)}.tn em{font-style:normal;font-size:11px;background:var(--cbg);padding:1px 7px;border-radius:99px}.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}.info h2{font-size:18px;margin-bottom:8px}.info ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}.info li b{color:var(--fg)}.info code{font-size:12px;background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:0 4px}.credit,.foot,.info ul{color:var(--muted)}.foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;font-size:13px}.credit a,.credit b,.foot a{color:var(--accent)}.credit{text-align:center;font-size:14px;border-top:1px solid var(--line);padding-top:16px}.credit a{font-weight:600;display:inline-block;margin-top:4px}.credit .cp{display:block;margin-top:6px;font-size:12px}.credit b{font-family:var(--font-display);font-weight:400;font-size:18px;letter-spacing:.02em}.theme{position:fixed;top:max(12px,env(safe-area-inset-top,0));right:max(16px,env(safe-area-inset-right,0));height:40px;min-width:40px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;opacity:.9;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.18)}.theme:focus-visible,.theme:hover{opacity:1;border-color:var(--accent)}.theme .ti{font-size:17px;line-height:1}@media (max-width:520px){.theme .tl{display:none}.theme{width:40px;padding:0;justify-content:center}}.totop{position:fixed;right:max(16px,env(safe-area-inset-right,0));bottom:max(16px,env(safe-area-inset-bottom,0));width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:20px;line-height:1;display:grid;place-items:center;opacity:0;pointer-events:none;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.18)}.totop.show{opacity:.5;pointer-events:auto}.totop.show:focus-visible,.totop.show:hover{opacity:1}@media (prefers-reduced-motion:no-preference){.totop{transition:opacity .2s ease}}@media (max-width:900px){.app{grid-template-columns:minmax(0,1fr)}.side{position:static;max-height:none;overflow:visible;padding:0}.goal{grid-template-columns:1fr}}</style>
+<style>
+/* Layout: menu lateral fixo (busca, livros escolhidos, categorias, progresso por tier) + área principal
+   com cartões compactos por tier. Cada livro tem um espaço de ícone (icons/<nome>.png) com sigla de reserva.
+   A cor do cartão segue o progresso: vermelho em 0%, amarelo em 50%, verde em 100%.
+   A cor de cada tier segue a escala de raridade: ardósia, jade, azul, roxo, ouro, carmim, magenta. */
+:root {
+  --bg: #EDF1EF; --surface: #FFFFFF; --surface2: #F5F8F6;
+  --fg: #15211E; --muted: #4F5F5A; --line: #CFD9D5;
+  --accent: #0B6B55; --on-accent: #FFFFFF; --danger: #B3362B;
+  --cs: 70%; --cl: 45%; --ts: 80%; --tl: 26%; --bs: 85%; --bl: 91%; --brs: 65%; --brl: 50%;
+  --okbg: #1F9D55; --okfg: #FFFFFF; --okbd: #14783E; --xbg: #15211E; --xfg: #E5EEEB; --xmuted: #98AAA4; --xline: #2D4239; --xinp: #1F2D29; --xyel: #F4C74F; --fgbg: #4B49C9; --fgfg: #FFFFFF; --fgbd: #3533A0;
+  --t1: #4C5A62; --t1bg: #E3E8EB;
+  --t2: #0B6B55; --t2bg: #D8EFE6;
+  --t3: #1D58A3; --t3bg: #DCE9F8;
+  --t4: #6A3C9E; --t4bg: #EBE0F7;
+  --t5: #8A5200; --t5bg: #F8E8C6;
+  --t6: #A3243B; --t6bg: #F9DDE2;
+  --t7: #912C80; --t7bg: #F4DCF0;
+  --font-display: 'Marcellus', 'Palatino Linotype', Georgia, serif;
+  --font-body: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1412; --surface: #151F1C; --surface2: #1A2623;
+    --fg: #E5EEEB; --muted: #98AAA4; --line: #28372F;
+    --accent: #4CC9A0; --on-accent: #06241A; --danger: #F08A80;
+    --cs: 65%; --cl: 48%; --ts: 75%; --tl: 72%; --bs: 45%; --bl: 14%; --brs: 55%; --brl: 40%;
+    --okbg: #1F9D55; --okfg: #FFFFFF; --okbd: #5FE39A; --xbg: #FFFFFF; --xfg: #15211E; --xmuted: #4F5F5A; --xline: #CFD9D5; --xinp: #F5F8F6; --xyel: #9A6400; --fgbg: #4B49C9; --fgfg: #FFFFFF; --fgbd: #A9A7FF;
+    --t1: #B3C0C7; --t1bg: #212C31;
+    --t2: #5DD3AA; --t2bg: #12342A;
+    --t3: #86B8F2; --t3bg: #162A42;
+    --t4: #C4A3F2; --t4bg: #2A1D40;
+    --t5: #F2BA56; --t5bg: #3A2B0E;
+    --t6: #F29AAA; --t6bg: #41202A;
+    --t7: #E6A0DA; --t7bg: #3A1F36;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1412; --surface: #151F1C; --surface2: #1A2623;
+  --fg: #E5EEEB; --muted: #98AAA4; --line: #28372F;
+  --accent: #4CC9A0; --on-accent: #06241A; --danger: #F08A80;
+  --cs: 65%; --cl: 48%; --ts: 75%; --tl: 72%; --bs: 45%; --bl: 14%; --brs: 55%; --brl: 40%;
+  --okbg: #1F9D55; --okfg: #FFFFFF; --okbd: #5FE39A; --xbg: #FFFFFF; --xfg: #15211E; --xmuted: #4F5F5A; --xline: #CFD9D5; --xinp: #F5F8F6; --xyel: #9A6400; --fgbg: #4B49C9; --fgfg: #FFFFFF; --fgbd: #A9A7FF;
+  --t1: #B3C0C7; --t1bg: #212C31;
+  --t2: #5DD3AA; --t2bg: #12342A;
+  --t3: #86B8F2; --t3bg: #162A42;
+  --t4: #C4A3F2; --t4bg: #2A1D40;
+  --t5: #F2BA56; --t5bg: #3A2B0E;
+  --t6: #F29AAA; --t6bg: #41202A;
+  --t7: #E6A0DA; --t7bg: #3A1F36;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 14px; line-height: 1.5;
+  padding-block: 18px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.t1, .t8 { --c: var(--t1); --cbg: var(--t1bg); }
+.t2 { --c: var(--t2); --cbg: var(--t2bg); }
+.t3 { --c: var(--t3); --cbg: var(--t3bg); }
+.t4 { --c: var(--t4); --cbg: var(--t4bg); }
+.t5 { --c: var(--t5); --cbg: var(--t5bg); }
+.t6 { --c: var(--t6); --cbg: var(--t6bg); }
+.t7 { --c: var(--t7); --cbg: var(--t7bg); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; margin: 0; text-wrap: balance; }
+h1 { font-size: 27px; line-height: 1.1; }
+h2 { font-size: 20px; }
+h3 { font-size: 15px; line-height: 1.25; font-family: var(--font-body); font-weight: 600; }
+p { margin: 0; }
+.eyebrow { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.stack { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+.app { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 26px; max-width: 1440px; margin: 0 auto; align-items: start; }
+.side { position: sticky; top: 14px; max-height: calc(100vh - 28px); overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 2px 6px 2px 2px; scrollbar-width: thin; }
+.main { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.sb { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.sb-h { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.hint { color: var(--muted); font-size: 13px; }
+
+.search label { display: block; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.search input { border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 9px 12px; min-height: 40px; width: 100%; }
+
+.ico { position: relative; display: inline-grid; place-items: center; flex: none; width: var(--s, 32px); height: var(--s, 32px); border-radius: 8px; background: var(--cbg); color: var(--c); border: 1px solid var(--line); overflow: hidden; }
+.ico .ini { font-size: calc(var(--s, 32px) * .36); font-weight: 700; letter-spacing: .02em; }
+.ico img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ico.has .ini { visibility: hidden; }
+
+.mine-row { display: flex; align-items: center; gap: 10px; }
+.mine-row .mt { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.mine-row .mt b { font-weight: 600; overflow-wrap: anywhere; line-height: 1.2; }
+.mine-row .mt span { font-size: 12px; color: var(--c); }
+.rm { border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; width: 32px; height: 32px; font-size: 18px; line-height: 1; flex: none; }
+.rm:hover { border-color: var(--danger); color: var(--danger); }
+
+.cat { border-top: 1px solid var(--line); padding-top: 6px; }
+.cat:first-of-type { border-top: 0; padding-top: 0; }
+.cat summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; padding: 6px 2px; }
+.cat summary::-webkit-details-marker { display: none; }
+.cat summary::before { content: '\25B8'; color: var(--muted); font-size: 12px; margin-right: 6px; }
+.cat[open] summary::before { content: '\25BE'; }
+.cat summary .l { flex: 1; }
+.cat summary .n { font-size: 12px; color: var(--muted); }
+.cat summary .s { font-size: 11px; font-weight: 600; background: var(--accent); color: var(--on-accent); border-radius: 99px; padding: 0 7px; }
+.blist { display: flex; flex-direction: column; gap: 2px; padding-bottom: 6px; }
+.grp { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 6px 2px 2px; }
+.brow { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 5px 8px; border-radius: 8px; border: 1px solid transparent; background: transparent; position: relative; }
+.brow:hover { background: var(--surface2); }
+.brow[aria-pressed="true"] { background: var(--surface2); border-color: var(--accent); }
+.brow[aria-pressed="true"]::after { content: '\2713'; position: absolute; right: 10px; color: var(--accent); font-weight: 700; }
+.brow .tg { flex: none; font-size: 11px; font-weight: 700; color: var(--c); background: var(--cbg); border-radius: 6px; padding: 1px 6px; min-width: 28px; text-align: center; }
+.brow .bn { min-width: 0; flex: 1; font-weight: 500; line-height: 1.2; overflow-wrap: anywhere; padding-right: 18px; }
+.brow .tb, .cat summary .tb { display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--c); background: var(--cbg); border-radius: 5px; padding: 0 5px; margin-right: 6px; vertical-align: 1px; }
+.sb.costs { gap: 8px; background: var(--xbg); color: var(--xfg); border-color: var(--xline); }
+.sb.costs .sb-h, .sb.costs .k, .sb.costs .cu, .sb.costs .r { color: var(--xmuted); }
+.sb.costs .pw input { background: var(--xinp); border-color: var(--xline); color: var(--xfg); }
+.sb.costs .ico { --c: var(--xfg); --cbg: var(--xinp); border-color: var(--xline); }
+.sb.costs .cout { border-top-color: var(--xline); }
+.sb.costs .cout .v { color: var(--xyel); font-weight: 600; }
+.costs .k { color: var(--muted); font-size: 12.5px; }
+.cin { display: flex; flex-direction: column; gap: 8px; }
+.pin { display: flex; flex-direction: column; gap: 3px; }
+.pw { display: flex; align-items: center; gap: 8px; }
+.pw input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--surface2); border-radius: 8px; padding: 7px 10px; min-height: 38px; font-family: var(--font-mono); text-align: right; }
+.cu { color: var(--muted); font-size: 12.5px; }
+.cout { border-top: 1px solid var(--line); padding-top: 8px; }
+.cout .v { font-size: 20px; overflow-wrap: anywhere; line-height: 1.2; color: var(--accent); }
+.cout .r { font-size: 12.5px; color: var(--muted); }
+.brow .bt { font-size: 11px; font-weight: 600; color: var(--c); }
+.none { color: var(--muted); padding: 6px 2px; }
+
+.tn-row { display: flex; flex-direction: column; gap: 4px; text-align: left; width: 100%; background: transparent; border: 0; border-radius: 8px; padding: 6px 4px; }
+.tn-row:hover { background: var(--surface2); }
+.tn-top { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+.tn-top .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
+.tn-top .tdn { margin-left: auto; font-size: 12px; color: var(--muted); }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.goal { display: grid; grid-template-columns: 1fr minmax(170px, 230px); gap: 14px 24px; align-items: center; }
+.goal-list { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.goal-item h2 { font-size: 22px; margin-top: 2px; }
+.goal-item p { color: var(--muted); font-size: 13px; }
+.overall { display: flex; flex-direction: column; gap: 6px; }
+.overall .big { font-size: 30px; line-height: 1; }
+.overall .lbl { color: var(--muted); font-size: 12.5px; }
+.pill { display: inline-block; background: var(--cbg); color: var(--c); border-radius: 99px; padding: 1px 9px; font-size: 11.5px; font-weight: 600; letter-spacing: .04em; }
+.bar { height: 8px; background: var(--surface2); border: 1px solid var(--line); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--c, var(--accent)); }
+@media (prefers-reduced-motion: no-preference) { .bar i { transition: width .25s ease; } }
+
+.mats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.mat { padding: 10px 14px; }
+.mi { display: flex; align-items: center; gap: 12px; }
+.ico.tm { --c: var(--accent); --cbg: var(--surface2); }
+.mat .k { color: var(--muted); font-size: 12.5px; }
+.mat .v { font-size: 22px; line-height: 1.2; }
+.mat .r { font-size: 12px; color: var(--muted); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lg { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--sb); background: var(--sbg); color: var(--st); border-radius: 99px; padding: 3px 11px; font-size: 12.5px; font-weight: 600; }
+.lg .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--sc); }
+.how { color: var(--muted); font-size: 12.5px; max-width: 80ch; }
+.how summary { cursor: pointer; font-weight: 600; }
+
+/* Cor do cartão pelo matiz --h: 4 (vermelho) em 0%, 46 (amarelo) em 50%, 140 (verde) em 100% */
+@property --h { syntax: '<number>'; inherits: true; initial-value: 4; }
+.s-none { --h: 4; }
+.s-prog { --h: 46; }
+.s-done { --h: 140; }
+.s-none, .s-prog, .s-done {
+  --sc: hsl(var(--h) var(--cs) var(--cl));
+  --st: hsl(var(--h) var(--ts) var(--tl));
+  --sbg: hsl(var(--h) var(--bs) var(--bl));
+  --sb: hsl(var(--h) var(--brs) var(--brl));
+}
+@media (prefers-reduced-motion: no-preference) { .card.s-none, .card.s-prog, .card.s-done { transition: --h .35s ease; } }
+
+.tier-sec { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 14px; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.sec-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sec-meta { color: var(--muted); font-size: 12.5px; }
+.sec-desc { color: var(--muted); max-width: 76ch; font-size: 13px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card.s-done, .card.s-prog, .card.s-none { background: var(--sbg); border-color: var(--sb); }
+.c-top { display: flex; align-items: flex-start; gap: 10px; }
+.c-id { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.c-id h3 { overflow-wrap: anywhere; }
+.attrs { color: var(--muted); font-size: 12px; line-height: 1.3; }
+.stock { font-size: 11.5px; color: var(--muted); }
+.qty { font-size: 17px; line-height: 1; color: var(--c); background: var(--cbg); padding: 4px 7px; border-radius: 6px; white-space: nowrap; }
+
+.recipe { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.recipe li { display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; background: var(--cbg); color: var(--c); border-radius: 6px; padding: 4px 7px 5px; --h: 4; }
+.recipe li .ri { display: flex; align-items: center; gap: 7px; }
+.recipe li .rn { min-width: 0; flex: 1; overflow-wrap: anywhere; line-height: 1.2; }
+.recipe li .rc { font-size: 12px; font-weight: 600; color: hsl(var(--h) var(--ts) var(--tl)); white-space: nowrap; }
+.recipe li.ok { background: var(--okbg); color: var(--okfg); box-shadow: inset 0 0 0 1px var(--okbd); }
+.recipe li.ok .rc { color: var(--okfg); font-weight: 700; }
+.recipe li.forge { background: var(--fgbg); color: var(--fgfg); box-shadow: inset 0 0 0 1px var(--fgbd); }
+.recipe li.forge .rc { color: var(--fgfg); font-weight: 700; }
+.rbar { display: flex; gap: 2px; height: 7px; }
+.rbar.dense { gap: 1px; }
+.rbar i { flex: 1 1 0; min-width: 0; border-radius: 2px; background: var(--surface); border: 1px solid var(--line); }
+.rbar i.on { background: hsl(var(--h) var(--cs) var(--cl)); border-color: hsl(var(--h) var(--cs) var(--cl)); }
+.recipe li.ok .rbar i, .recipe li.forge .rbar i { background: rgba(255,255,255,.25); border-color: transparent; }
+.recipe li.ok .rbar i.on, .recipe li.forge .rbar i.on { background: #fff; }
+@media (prefers-reduced-motion: no-preference) { .rbar i { transition: background-color .2s ease; } }
+.ready { font-size: 12px; font-weight: 600; border-radius: 6px; padding: 4px 8px; }
+.ready.go { background: hsl(140 var(--bs) var(--bl)); border: 1px solid hsl(140 var(--brs) var(--brl)); color: hsl(140 var(--ts) var(--tl)); }
+.ready.fin { background: var(--surface2); border: 1px solid var(--line); color: var(--muted); }
+.ready.go::before, .ready.fin::before { content: '\2713 '; }
+
+.c-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+.counter { display: inline-flex; align-items: center; gap: 4px; }
+.counter .val { min-width: 46px; text-align: center; font-size: 13px; }
+.cbtn { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); display: inline-grid; place-items: center; font-size: 16px; line-height: 1; }
+.cbtn:hover:not(:disabled) { border-color: var(--accent); }
+.cbtn:disabled { opacity: .35; cursor: default; }
+.cbtn.all { font-size: 12px; width: auto; padding: 0 8px; font-weight: 600; }
+.pct { font-size: 13px; font-weight: 600; color: var(--st); }
+.pbar { display: flex; gap: 2px; height: 10px; }
+.pbar.dense { gap: 1px; }
+.pbar i { flex: 1 1 0; min-width: 0; border-radius: 3px; background: var(--surface); border: 1px solid var(--line); }
+.pbar i.on { background: var(--sc); border-color: var(--sc); }
+.pbar.dense i { border-radius: 2px; }
+@media (prefers-reduced-motion: no-preference) { .pbar i { transition: background-color .2s ease; } }
+
+.reqs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.reqs li { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 6px; }
+.reqs li:first-child { border-top: 0; padding-top: 0; }
+.reqs .rl { min-width: 0; overflow-wrap: anywhere; }
+.reqs .rt { color: var(--muted); }
+
+.treebox { display: flex; flex-direction: column; gap: 10px; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 12px; font-weight: 500; min-height: 36px; }
+.btn:hover { border-color: var(--accent); }
+.btn.danger { border-color: var(--danger); color: var(--danger); }
+.tree-root { display: flex; flex-direction: column; gap: 14px; }
+.tree { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; overflow-x: auto; }
+.tree ul { list-style: none; margin: 0; padding-left: 20px; border-left: 1px solid var(--line); margin-left: 10px; }
+.tree > ul { border-left: 0; padding-left: 0; margin-left: 0; }
+.tree li { margin: 2px 0; }
+.tree summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+.tree summary::-webkit-details-marker { display: none; }
+.tree summary::before { content: '\25B8'; color: var(--muted); font-size: 12px; width: 12px; }
+.tree details[open] > summary::before { content: '\25BE'; }
+.tree .leaf { padding: 2px 0 2px 18px; }
+.tn { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.tn b { font-family: var(--font-mono); font-weight: 600; color: var(--c); }
+.tn em { font-style: normal; font-size: 11px; font-weight: 600; color: var(--c); background: var(--cbg); padding: 1px 7px; border-radius: 99px; }
+
+.info { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
+.info h2 { font-size: 18px; margin-bottom: 8px; }
+.info ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: var(--muted); }
+.info li b { color: var(--fg); font-weight: 600; }
+.info code { font-family: var(--font-mono); font-size: 12px; background: var(--surface2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+.foot a { color: var(--accent); }
+.credit { text-align: center; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
+.credit a { color: var(--accent); font-weight: 600; display: inline-block; margin-top: 4px; }
+.credit .cp { display: block; margin-top: 6px; font-size: 12px; }
+.credit .cp a { margin-top: 0; font-weight: 500; }
+.credit b { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--accent); letter-spacing: .02em; }
+
+.theme { position: fixed; top: max(12px, env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); height: 40px; min-width: 40px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; opacity: .9; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,.18); }
+.theme:hover, .theme:focus-visible { opacity: 1; border-color: var(--accent); }
+.theme .ti { font-size: 17px; line-height: 1; }
+@media (max-width: 520px) { .theme .tl { display: none; } .theme { width: 40px; padding: 0; justify-content: center; } }
+.totop { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font-size: 20px; line-height: 1; display: grid; place-items: center; opacity: 0; pointer-events: none; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,.18); }
+.totop.show { opacity: .5; pointer-events: auto; }
+.totop.show:hover, .totop.show:focus-visible { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) { .totop { transition: opacity .2s ease; } }
+@media (max-width: 900px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; max-height: none; overflow: visible; padding: 0; }
+  .goal { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
 
@@ -51,13 +351,762 @@
       <button class="btn" id="reset" type="button">Zerar progresso desta seleção</button>
     </footer>
 
-    <p class="credit">Feito por <b>Heras</b>, junto com o Claude.<br><a href="https://www.youtube.com/@christheras" target="_blank" rel="noopener">youtube.com/@christheras</a><span class="cp">© 2026 Heras. Todos os direitos reservados. Não copie nem republique sem autorização.</span></p>
+    <p class="credit">Feito por <b>Heras</b>, junto com o Claude.<br><a href="https://www.youtube.com/@christheras" target="_blank" rel="noopener">youtube.com/@christheras</a><span class="cp">© 2026 Heras · Software livre sob a <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GNU GPL v3</a> · <a href="https://github.com/christheras/LivroDivinoTracker" target="_blank" rel="noopener">Código-fonte</a></span></p>
   </main>
 </div>
 <button class="theme" id="theme" type="button"><span class="ti" aria-hidden="true"></span><span class="tl"></span></button>
 <button class="totop" id="totop" type="button" aria-label="Voltar ao topo">&#8593;</button>
 
-<script>var e={1:"Iniciante",2:"Aprendiz",3:"Discípulo",4:"Especialista",5:"Mestre",6:"Grão-Mestre",7:"Enciclopedista"},a={};function t(e,t){a[e]={tier:1,attrs:t}}function o(e,t,o,r){a[t]={tier:e,ing:o,attrs:r}}function r(e,t){a[e]={tier:7,attrs:t,special:!0}}function n(e,t,o,r){a[e]={tier:8,group:t,attrs:o,reqs:r}}t("Sorriso da Flora","Inteligência +5"),t("Rio de Sangue","Recuperação de HP +3, Experiência +1%"),t("Orgulho Paterno","Constituição +5"),t("Favor do Imperador","Destreza +5"),t("Poder Interno","Força +5"),t("Chama Kármica","Inteligência +4, Constituição +3"),t("Lua da Noite em Chamas","Recuperação de MP +3, Experiência +1%"),t("Escudo Primo","Força +4, Constituição +3"),t("Pessegueiro","Destreza +4, Constituição +3"),o(2,"Lótus Vermelha",["Sorriso da Flora","Chama Kármica","Pessegueiro"],"Inteligência +7, Constituição +6"),o(2,"Flor de Pessegueiro",["Pessegueiro","Favor do Imperador","Sorriso da Flora"],"Destreza +10"),o(2,"Estampido",["Orgulho Paterno","Escudo Primo","Chama Kármica"],"Constituição +10"),o(2,"Lobo da Guerra",["Rio de Sangue","Chama Kármica","Escudo Primo"],"Recuperação de HP +6, Experiência +2%"),o(2,"Chuva de Pétalas",["Pessegueiro","Favor do Imperador","Orgulho Paterno"],"Destreza +7, Constituição +6"),o(2,"Resiliência",["Escudo Primo","Poder Interno","Chama Kármica"],"Força +10"),o(2,"Força Inigualável",["Escudo Primo","Poder Interno","Orgulho Paterno"],"Força +7, Constituição +6"),o(2,"Renascido das Chamas",["Lua da Noite em Chamas","Chama Kármica","Sorriso da Flora"],"Recuperação de MP +6, Experiência +2%"),o(2,"Chamas Secretas",["Sorriso da Flora","Chama Kármica","Poder Interno"],"Inteligência +10"),o(3,"Coração Leal de Gelo",["Chamas Secretas","Flor de Pessegueiro","Resiliência"],"Inteligência +15"),o(3,"Portal do Yang",["Resiliência","Força Inigualável","Lótus Vermelha"],"Força +15"),o(3,"Beleza Sem Forma",["Flor de Pessegueiro","Força Inigualável","Chuva de Pétalas"],"Destreza +15"),o(3,"Canção do Vinho",["Força Inigualável","Estampido","Lótus Vermelha"],"Força +9, Constituição +8"),o(3,"Som do Arrependimento",["Estampido","Lótus Vermelha","Força Inigualável"],"Constituição +15"),o(3,"Aniquilação",["Lobo da Guerra","Chuva de Pétalas","Resiliência"],"Recuperação de HP +9, Experiência +3%"),o(3,"Crepúsculo Eterno",["Chuva de Pétalas","Flor de Pessegueiro","Estampido"],"Destreza +9, Constituição +8"),o(3,"Chama Rubra",["Chamas Secretas","Lótus Vermelha","Chuva de Pétalas"],"Inteligência +9, Constituição +8"),o(3,"Fragrância da Chuva de Sangue",["Renascido das Chamas","Lótus Vermelha","Chuva de Pétalas"],"Recuperação de MP +9, Experiência +3%"),o(4,"Espinhos de Rosa",["Crepúsculo Eterno","Beleza Sem Forma","Chama Rubra"],"Destreza +20"),o(4,"Destino",["Portal do Yang","Canção do Vinho","Beleza Sem Forma"],"Força +20"),o(4,"Encantador de Almas",["Crepúsculo Eterno","Beleza Sem Forma","Chama Rubra"],"Destreza +13, Constituição +12"),o(4,"Anarquia",["Som do Arrependimento","Coração Leal de Gelo","Canção do Vinho"],"Constituição +20"),o(4,"Tocado pelo Vento da Primavera",["Chama Rubra","Coração Leal de Gelo","Som do Arrependimento"],"Inteligência +20"),o(4,"Tigre do Vento, Dragão do Céu",["Canção do Vinho","Portal do Yang","Crepúsculo Eterno"],"Força +13, Constituição +12"),o(4,"Céu que Chora",["Fragrância da Chuva de Sangue","Crepúsculo Eterno","Som do Arrependimento"],"Recuperação de MP +12, Experiência +4%"),o(4,"Paixão",["Chama Rubra","Coração Leal de Gelo","Portal do Yang"],"Inteligência +13, Constituição +12"),o(4,"Ao Sul dos Rios",["Aniquilação","Flor de Pessegueiro","Chamas Secretas"],"Recuperação de HP +9, Experiência +4%"),o(5,"Floresta Vasta",["Encantador de Almas","Espinhos de Rosa","Anarquia"],"Destreza +13, Constituição +12, Crítico +1%"),o(5,"Risada de Loucura",["Anarquia","Tigre do Vento, Dragão do Céu","Paixão"],"Constituição +25"),o(5,"Cidade Estrangeira",["Encantador de Almas","Espinhos de Rosa","Destino"],"Destreza +20, Crítico +1%"),o(5,"Disfarce de Sangue",["Tigre do Vento, Dragão do Céu","Destino","Anarquia"],"Força +13, Constituição +12, Crítico +1%"),o(5,"Júpiter",["Espinhos de Rosa","Encantador de Almas","Anarquia"],"Destreza +13, Constituição +12, Movimento +0,1 m/s"),o(5,"Arrogância",["Tigre do Vento, Dragão do Céu","Destino","Anarquia"],"Força +13, Constituição +12, HP +70"),o(5,"Os Quatro Grandes Elementos",["Anarquia","Tigre do Vento, Dragão do Céu","Destino"],"Força +20, Crítico +1%"),o(5,"Bênçãos da Terra",["Tigre do Vento, Dragão do Céu","Anarquia","Paixão"],"Constituição +20, Redução de dano físico +3%"),o(5,"Uivo do Mar",["Encantador de Almas","Tocado pelo Vento da Primavera","Espinhos de Rosa"],"Inteligência +20, Movimento +0,1 m/s"),o(5,"Fonte do Deserto",["Espinhos de Rosa","Paixão","Tocado pelo Vento da Primavera"],"Inteligência +13, Constituição +12, Movimento +0,1 m/s"),o(5,"Beleza da Serpente",["Destino","Anarquia","Encantador de Almas"],"Força +20, Movimento +0,1 m/s"),o(5,"Espelho do Nada",["Ao Sul dos Rios","Céu que Chora","Paixão"],"Força +9, Destreza +9, Constituição +8, Inteligência +9, Crítico +1%"),o(5,"Partindo os Céus e a Terra",["Espinhos de Rosa","Encantador de Almas","Anarquia"],"Destreza +25"),o(5,"Fragrância dos Céus",["Paixão","Tocado pelo Vento da Primavera","Céu que Chora"],"Inteligência +13, Constituição +12, Tempo de invocação -1%"),o(5,"Os Treze Guardiões",["Ao Sul dos Rios","Céu que Chora","Paixão"],"Força +9, Destreza +9, Constituição +8, Inteligência +9, HP +70"),o(5,"Água Gentil",["Paixão","Tigre do Vento, Dragão do Céu","Tocado pelo Vento da Primavera"],"Inteligência +20, Crítico +1%"),o(6,"Lágrima Vermelha",["Bênçãos da Terra","Os Quatro Grandes Elementos","Risada de Loucura"],"Constituição +6, Redução de dano físico +6%"),o(6,"Mudança do Céu e da Terra",["Arrogância","Beleza da Serpente","Disfarce de Sangue"],"Força +13, Constituição +12, Redução de dano físico +6%"),o(6,"Ritmo das Ondas",["Fragrância dos Céus","Água Gentil","Partindo os Céus e a Terra"],"Inteligência +13, Constituição +12, Tempo de invocação -2%"),o(6,"Três Flores",["Fragrância dos Céus","Cidade Estrangeira","Água Gentil"],"Inteligência +13, Constituição +12, Crítico +2%"),o(6,"Coração Furioso",["Os Quatro Grandes Elementos","Cidade Estrangeira","Disfarce de Sangue"],"Força +20, Crítico +2%"),o(6,"Zen de Esquecimento",["Risada de Loucura","Júpiter","Arrogância"],"Destreza +13, Constituição +12, HP +140"),o(6,"Pan Gu",["Os Treze Guardiões","Disfarce de Sangue","Espelho do Nada"],"Força +9, Destreza +9, Constituição +8, Inteligência +9, Crítico +1%, Tempo de invocação -1%, Intervalo de ataque -0,05"),o(6,"Passar Rio com Palha",["Beleza da Serpente","Cidade Estrangeira","Partindo os Céus e a Terra"],"Destreza +20, Movimento +0,2 m/s"),o(6,"Dezoito Estudiosos",["Água Gentil","Os Treze Guardiões","Beleza da Serpente"],"Força +9, Destreza +9, Constituição +8, Inteligência +9, HP +70, MP +80"),o(6,"Gelo Estrangeiro",["Uivo do Mar","Fonte do Deserto","Água Gentil"],"Inteligência +35"),o(6,"Sorriso da Rainha",["Floresta Vasta","Arrogância","Disfarce de Sangue"],"Força +13, Constituição +12, Crítico +2%"),o(6,"Água que Perfura a Pedra",["Risada de Loucura","Água Gentil","Os Quatro Grandes Elementos"],"Constituição +20, Crítico +2%"),o(6,"Hades de Norte",["Partindo os Céus e a Terra","Uivo do Mar","Risada de Loucura"],"Inteligência +20, Movimento +0,2 m/s"),o(6,"Asa Unificadora",["Partindo os Céus e a Terra","Fonte do Deserto","Júpiter"],"Destreza +13, Constituição +12, Movimento +0,2 m/s"),o(6,"Vento da Manhã",["Fonte do Deserto","Floresta Vasta","Partindo os Céus e a Terra"],"Destreza +35"),o(6,"Segurar a Onda",["Disfarce de Sangue","Beleza da Serpente","Arrogância"],"Força +35"),r("Canto da Noite","Força +13, Destreza +13, Constituição +12, Inteligência +13, Crítico +1%, Tempo de invocação -1%, Intervalo de ataque -0,05"),r("Trompete de Ferro","Inteligência +45"),r("Canto de Dragão da Água","Constituição +45"),r("Uma Bela Flor","Destreza +25, Movimento +0,2 m/s"),r("Deus Erlang","Destreza +25, Crítico +2%"),r("Três Estudiosos","Força +45");n("Pergaminho Filial da Vontade","Base do clã","Força +15",[{label:"Mérito",text:"29.030"},{label:"Moedas",text:"91.445.800"}]),n("Pergaminho Filial do Espírito","Base do clã","Inteligência +15",[{label:"Mérito",text:"29.030"},{label:"Moedas",text:"91.445.800"}]),n("Pergaminho Filial do Equilíbrio","Base do clã","Destreza +15",[{label:"Mérito",text:"29.030"},{label:"Moedas",text:"91.445.800"}]),n("Pergaminho Filial da Proteção","Base do clã","Constituição +15",[{label:"Mérito",text:"29.030"},{label:"Moedas",text:"91.445.800"}]),n("Pergaminho Filial da Sabedoria","Base do clã","Experiência +2%",[{label:"Mérito",text:"13.824"},{label:"Moedas",text:"43.545.600"}]);var i=[{label:"Doce Lembrança",qty:400},{label:"Amor Eterno",qty:99},{label:"Moedas",text:"5.200.000"}];function s(e){var t={},o={};function r(e,n){t[e]=(t[e]||0)+1,n&&(o[e]=o[e]||new Set).add(n),(a[e].ing||[]).forEach(function(a){r(a,e)})}e.forEach(function(e){r(e,null)});var n={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0};return Object.keys(t).forEach(function(e){n[a[e].tier]+=t[e]}),{need:t,parents:o,byTier:n}}function l(e){return{fragments:3*e,blanks:4*e}}n("Pavão do Sudoeste","Casamento","Força +11, Destreza +11, Magia +11, Vitalidade +11, Nível de ataque +1, Nível de defesa +1",i),n("Romance Ideal","Casamento","Magia +17, Vitalidade +16, Nível de ataque +2",i),n("Desejo da Borboleta","Casamento","Destreza +17, Vitalidade +16, Nível de defesa +2",i),n("Mortal Celestial","Casamento","Força +17, Vitalidade +16, Nível de defesa +2",i),n("Jean Mon","Casamento","Magia +17, Vitalidade +16, Nível de defesa +2",i),n("O Quarto do Lado Oeste","Casamento","Destreza +17, Vitalidade +16, Nível de defesa +2",i),n("A Dama Branca","Casamento","Força +17, Vitalidade +16, Nível de defesa +2",i),n("Domínio","Guerra das Nações","Força +25, Destreza +25, Inteligência +25, Crítico +2%, Tempo de invocação -3%, Intervalo de ataque -0,05, Movimento +0,1 m/s, HP +280",[{label:"1 livro Enciclopedista, à sua escolha",qty:1},{label:"Selo do Soberano",qty:157},{label:"Ouro de Ébano",qty:6},{label:"Moedas",text:"30.000.000"}]),n("Imperador","Guerra das Nações","Força +45, Destreza +45, Inteligência +45, Crítico +3%, Tempo de invocação -5%, Intervalo de ataque -0,05, Movimento +0,2 m/s, HP +400",[{label:"Livro Domínio",qty:1},{label:"Selo do Soberano",qty:538},{label:"Ouro de Ébano",qty:24},{label:"Moedas",text:"90.000.000"}]),"undefined"!=typeof module&&module.exports&&(module.exports={RECIPES:a,TIER_NAMES:e,tally:s,materials:l}),function(){var t=[{id:"gm",tier:6,label:"Grão-Mestre",test:function(e){return 6===e.tier}},{id:"m",tier:5,label:"Mestre",test:function(e){return 5===e.tier}},{id:"enc",tier:7,label:"Enciclopedista",test:function(e){return 7===e.tier}},{id:"esp",tier:4,label:"Especialista",test:function(e){return 4===e.tier}},{id:"disc",tier:3,label:"Discípulo",test:function(e){return 3===e.tier}},{id:"apr",tier:2,label:"Aprendiz",test:function(e){return 2===e.tier}},{id:"ini",tier:1,label:"Iniciante",test:function(e){return 1===e.tier}},{id:"out",label:"Clã, casamento e guerra",test:function(e){return 8===e.tier}}],o={1:"A base da árvore. Cada livro custa 3 Fragmentos de Escrita Divina e 4 Livros em Branco Divinos.",2:"Cada livro usa 3 livros de Tier 1.",3:"Cada livro usa 3 livros de Tier 2.",4:"Cada livro usa 3 livros de Tier 3. Ao Sul dos Rios é a exceção e leva também 2 de Tier 2.",5:"Cada livro usa 3 livros de Tier 4.",6:"Cada livro usa 3 livros de Tier 5. Também dá para forjar direto com um Manuscrito do Destino, obtido em baús ou no Sistema de Chaves.",7:"Não usam outros livros na receita. Método I: forja direta com um Pergaminho dos Deuses (baús ou Sistema de Chaves). Método II: forje a Loucura do Luar com 1 livro Grão-Mestre mais 1 Escritura Ancestral (baús) e escolha livremente qualquer livro desta lista."},r="guia-livros-divinos-v2",n={goals:["Pan Gu"].slice(),cat:"gm",prog:{},prices:{frag:0,blank:0}};try{var i=JSON.parse(localStorage.getItem(r));i&&"object"==typeof i&&(Array.isArray(i.goals)&&(n.goals=i.goals.filter(function(e){return a[e]})),i.cat&&(n.cat=i.cat),i.prog&&"object"==typeof i.prog&&(n.prog=i.prog),i.prices&&"object"==typeof i.prices&&(n.prices={frag:Math.max(0,+i.prices.frag||0),blank:Math.max(0,+i.prices.blank||0)}))}catch(e){}var d="";function c(){try{localStorage.setItem(r,JSON.stringify(n))}catch(e){}}function u(e){return e.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()}function m(e){return String(e).replace(/\B(?=(\d{3})+(?!\d))/g,".")}function p(e){return document.getElementById(e)}function v(e,a,t){var o=document.createElement(e);return a&&Object.keys(a).forEach(function(e){var t=a[e];"class"===e?o.className=t:"text"===e?o.textContent=t:0===e.indexOf("on")?o.addEventListener(e.slice(2),t):!1!==t&&null!=t&&o.setAttribute(e,!0===t?"":t)}),(t||[]).forEach(function(e){null!=e&&o.appendChild("string"==typeof e?document.createTextNode(e):e)}),o}function g(){return n.goals.slice().sort().join("|")}function f(e){return(n.prog[g()]||{})[e]||0}function h(e,a){var t=g();n.prog[t]=n.prog[t]||{},n.prog[t][e]=a,c()}function C(e){return u(e).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")}function b(e,a,t,o){var r,n,i=v("span",{class:"ico "+o,style:"--s:"+t+"px","aria-hidden":"true"},[v("span",{class:"ini",text:(r=e,n=r.split(/\s+/).filter(function(e){return e.length>2||/^\d/.test(e)}),n.length||(n=r.split(/\s+/)),(n[0][0]+(n[1]?n[1][0]:n[0][1]||"")).toUpperCase())})]),s=new Image;return s.alt="",s.onload=function(){i.classList.add("has"),i.appendChild(s)},s.src="icons/"+a+".png",i}function x(e,t){return b(e,C(e),t,"t"+a[e].tier)}var E,y,P,F,D,M="Fragmento de Escrita Divina",q="Livro em Branco Divino",S={};function T(a){return 8===a.tier?a.group:"Tier "+a.tier+" · "+e[a.tier]}function L(){var e=p("mine");e.textContent="",e.appendChild(v("div",{class:"sb-h",text:"Meus livros"})),n.goals.length?n.goals.forEach(function(t){var o=a[t];e.appendChild(v("div",{class:"mine-row t"+o.tier},[x(t,36),v("div",{class:"mt"},[v("b",{text:t}),v("span",{text:T(o)})]),v("button",{class:"rm",type:"button","aria-label":"Remover "+t,text:"×",onclick:function(){A(t)}})]))}):e.appendChild(v("p",{class:"hint",text:"Escolha um ou mais livros na lista abaixo."}))}function k(e){var t=a[e];return v("button",{class:"brow t"+t.tier,type:"button","aria-pressed":n.goals.indexOf(e)>=0?"true":"false",title:t.attrs,onclick:function(){A(e)}},[x(e,28),v("span",{class:"bn"},[v("span",{class:"tb",text:8===t.tier?"Extra":"T"+t.tier}),e])])}function I(){var e=p("books");e.textContent="";var o=u(d.trim());if(o){e.appendChild(v("div",{class:"sb-h",text:"Resultado da busca"}));var r=Object.keys(a).filter(function(e){return u(e).indexOf(o)>=0||u(a[e].attrs).indexOf(o)>=0}).sort(function(e,t){return a[t].tier-a[e].tier});if(!r.length)return void e.appendChild(v("p",{class:"none",text:"Nenhum livro encontrado."}));var i=v("div",{class:"blist"});return r.forEach(function(e){i.appendChild(k(e))}),void e.appendChild(i)}e.appendChild(v("div",{class:"sb-h",text:"Todos os livros"})),t.forEach(function(t){var o,r=(o=t,Object.keys(a).filter(function(e){return o.test(a[e])})),i=r.filter(function(e){return n.goals.indexOf(e)>=0}).length,s=v("details",{class:"cat",open:!!S[t.id]},[v("summary",null,[v("span",{class:"l"+(t.tier?" t"+t.tier:"")},[t.tier?v("span",{class:"tb",text:"T"+t.tier}):null,t.label]),i?v("span",{class:"s num",text:String(i)}):null,v("span",{class:"n num",text:String(r.length)})])]);s.addEventListener("toggle",function(){S[t.id]=s.open,n.cat=t.id});var l=v("div",{class:"blist"}),d=null;r.forEach(function(e){var t=a[e];8===t.tier&&t.group!==d&&(d=t.group,l.appendChild(v("div",{class:"grp",text:t.group}))),l.appendChild(k(e))}),s.appendChild(l),e.appendChild(s)})}function A(e){var a=n.goals.indexOf(e);a>=0?n.goals.splice(a,1):n.goals.push(e),c(),L(),I(),H()}S[n.cat]=!0;function R(e){return e<=50?4+e/50*42:46+(e-50)/50*94}function z(){return[1,2,3,4,5,6,7].filter(function(e){return E.byTier[e]>0})}function O(e,a){var t=v("input",{type:"text",inputmode:"numeric",autocomplete:"off",placeholder:"0","aria-label":e});return t.value=n.prices[a]?String(n.prices[a]):"",t.addEventListener("input",function(){var e=parseInt(t.value.replace(/\D/g,""),10);n.prices[a]=isNaN(e)?0:e,c(),w()}),v("label",{class:"pin"},[v("span",{class:"k",text:e}),v("span",{class:"pw"},[b(e,C(e),34,"tm"),t,v("span",{class:"cu",text:"moedas"})])])}var V={},j=0;function w(){if(V.all){var e=n.prices.frag,a=n.prices.blank,t=E&&E.byTier?E.byTier[1]:0,o=l(t),r=Math.max(0,t-j);V.all.textContent=m(o.fragments*e+o.blanks*a)+" moedas",V.det.textContent=m(o.fragments)+" × "+m(e)+" + "+m(o.blanks)+" × "+m(a),V.left.textContent=t?e||a?"Ainda a gastar: "+m(3*r*e+4*r*a)+" moedas":"Informe os preços para ver o total":"Escolha um livro para calcular"}}function B(){var e=Object.keys(y).sort(function(e,t){return a[t].tier-a[e].tier}),t={};e.forEach(function(e){var o=Math.min(f(e),y[e].need),r=Math.min(t[e]||0,y[e].need);r>o&&(h(e,r),o=r),(a[e].ing||[]).forEach(function(e){t[e]=(t[e]||0)+o})})}function N(){var t=v("div",{class:"stack"});D={};var r=v("div",{class:"legend",role:"group","aria-label":"Legenda das cores dos cartões"});return[["done","Completo"],["prog","Em andamento"],["none","Não iniciado"]].forEach(function(e){var a=v("b",{class:"num",text:"0"});D[e[0]]=a,r.appendChild(v("span",{class:"lg s-"+e[0]},[v("i",{class:"dot"}),v("span",{text:e[1]}),a]))}),t.appendChild(r),t.appendChild(v("details",{class:"how"},[v("summary",{text:"Como funcionam as barrinhas das receitas"}),v("p",{text:"Dentro de cada receita, a barrinha mostra quanto do seu estoque já cobre aquele livro. O estoque é o que você fez menos o que já gastou nos livros de cima. Ao marcar um livro avançado, os livros usados nele já ficam marcados como feitos. Um mesmo livro pode aparecer em várias receitas e conta inteiro em cada uma, então confira o estoque antes de forjar. Ao marcar um livro avançado que você já tem, os livros usados nele são marcados como feitos automaticamente."})])),z().forEach(function(r){var n=function(e){return Object.keys(E.need).filter(function(t){return a[t].tier===e}).sort(function(e,a){return E.need[a]-E.need[e]||e.localeCompare(a,"pt")})}(r),i=v("span",{class:"sec-meta num"}),s=v("i");P[r].hdrDone=i,P[r].hdrBar=s,t.appendChild(v("section",{class:"tier-sec t"+r,id:"tier-"+r},[v("div",{class:"sec-head"},[v("div",{class:"sec-title"},[v("h2",{text:"Tier "+r+" · "+e[r]}),v("span",{class:"pill num",text:E.byTier[r]+(1===E.byTier[r]?" livro":" livros")})]),i]),v("div",{class:"bar"},[s]),v("p",{class:"sec-desc",text:o[r]}),v("div",{class:"grid"},n.map(function(e){return function(e,t){for(var o=a[e],r=E.need[e],n=E.parents[e]?Array.from(E.parents[e]).sort():[],i=v("span",{class:"val num"}),s=v("button",{class:"cbtn",type:"button","aria-label":"Diminuir "+e,text:"−"}),l=v("button",{class:"cbtn",type:"button","aria-label":"Aumentar "+e,text:"+"}),d=v("button",{class:"cbtn all",type:"button","aria-label":"Marcar todos de "+e+" como feitos",text:"Todos"}),c={},u=o.ing?v("ul",{class:"recipe","aria-label":"Ingredientes de "+e},o.ing.map(function(e){var t=v("span",{class:"rc num"}),o=v("div",{class:"rbar"}),r=v("li",{class:"t"+a[e].tier},[v("div",{class:"ri"},[v("span",{class:"rn",text:"1x "+e}),t]),o]);return c[e]={cnt:t,bar:o,li:r},r})):null,m=o.ing?v("p",{class:"ready"}):null,p=n.length?v("p",{class:"stock"}):null,g=v("span",{class:"pct num"}),C=[],b=0;b<r;b++)C.push(v("i"));var P=v("div",{class:"pbar"+(r>30?" dense":""),role:"progressbar","aria-label":"Progresso de "+e,"aria-valuemin":"0","aria-valuemax":"100"},C),F=v("article",{class:"card s-none t"+t},[v("div",{class:"c-top"},[x(e,40),v("div",{class:"c-id"},[v("h3",{text:e}),v("p",{class:"attrs",text:o.attrs})]),v("span",{class:"qty num",title:"Quantidade necessária",text:r+"x"})]),u,m,n.length?v("p",{class:"attrs",text:"Entra em: "+n.join(", ")}):null,p,v("div",{class:"c-foot"},[v("div",{class:"counter"},[s,i,l,d]),g]),P]);return s.addEventListener("click",function(){h(e,Math.max(0,f(e)-1)),K()}),l.addEventListener("click",function(){h(e,Math.min(r,f(e)+1)),B(),K()}),d.addEventListener("click",function(){h(e,r),B(),K()}),y[e]={el:F,val:i,minus:s,plus:l,need:r,tier:t,pct:g,segs:C,pbar:P,rows:c,ready:m,stock:p,parents:n},F}(e,r)}))]))}),t}function G(e,t){var o=a[e],r=v("span",{class:"tn t"+o.tier},[v("b",{text:"1x"}),v("span",{text:e}),v("em",{text:"T"+o.tier})]);return o.ing?v("li",null,[v("details",{open:t<2},[v("summary",null,[r]),v("ul",null,o.ing.map(function(e){return G(e,t+1)}))])]):v("li",null,[v("div",{class:"leaf"},[r])])}function H(){var t=p("results");if(t.textContent="",y={},P={},F=null,!n.goals.length)return E=null,j=0,w(),p("tnav").textContent="",void t.appendChild(v("div",{class:"panel"},[v("h2",{text:"Nenhum livro escolhido"}),v("p",{class:"sec-desc",text:"Escolha um livro no menu à esquerda para ver a árvore, as quantidades e marcar o progresso. Você pode escolher vários ao mesmo tempo."})]));E=s(n.goals),j=0,function(){var a=p("tnav");a.textContent="",P={};var t=z();t.length&&(a.appendChild(v("div",{class:"sb-h",text:"Progresso por tier"})),t.forEach(function(t){var o=v("i"),r=v("span",{class:"tdn num"});P[t]={done:r,bar:o,total:E.byTier[t]},a.appendChild(v("button",{class:"tn-row t"+t,type:"button",onclick:function(){var e=p("tier-"+t);e&&e.scrollIntoView({behavior:"smooth",block:"start"})}},[v("span",{class:"tn-top"},[v("i",{class:"dot"}),v("span",{text:"T"+t+" · "+e[t]}),r]),v("div",{class:"bar"},[o])]))}))}();var o=v("div",{class:"stack"});o.appendChild(function(){var e=v("i");F={pct:v("div",{class:"big num",text:"0%"}),sub:v("div",{class:"lbl"}),bar:e};var t=v("div",{class:"goal-list"},n.goals.map(function(e){var t=a[e];return v("div",{class:"goal-item t"+t.tier},[v("span",{class:"pill",text:T(t)}),v("h2",{text:e}),v("p",{text:t.attrs})])}));return v("section",{class:"panel goal","aria-label":"Livros escolhidos"},[t,v("div",{class:"overall"},[F.pct,v("div",{class:"bar"},[e]),F.sub])])}());var r=function(){if(!E.byTier[1])return null;var e=l(E.byTier[1]);F.matFrag=v("div",{class:"r num"}),F.matBlank=v("div",{class:"r num"});var a=0;return[1,2,3,4,5,6,7].forEach(function(e){a+=E.byTier[e]}),v("div",{class:"stack"},[v("section",{class:"mats","aria-label":"Materiais"},[v("div",{class:"panel mat mi"},[b(M,C(M),42,"tm"),v("div",null,[v("div",{class:"k",text:"Fragmentos de Escrita Divina"}),v("div",{class:"v num",text:m(e.fragments)}),F.matFrag])]),v("div",{class:"panel mat mi"},[b(q,C(q),42,"tm"),v("div",null,[v("div",{class:"k",text:"Livros em Branco Divinos"}),v("div",{class:"v num",text:m(e.blanks)}),F.matBlank])]),v("div",{class:"panel mat"},[v("div",{class:"k",text:"Livros a fabricar no total"}),v("div",{class:"v num",text:String(a)}),v("div",{class:"r",text:"Soma de todos os tiers"})])])])}();r&&o.appendChild(r),o.appendChild(N());var i=function(){var e=n.goals.filter(function(e){return 8===a[e].tier});if(!e.length)return null;var t=v("section",{class:"tier-sec t8","aria-label":"Requisitos extras"},[v("div",{class:"sec-head"},[v("h2",{text:"Requisitos de clã, casamento e guerra"})]),v("p",{class:"sec-desc",text:"Estes livros não usam a árvore de tiers. Marque os itens que você já juntou."})]),o=v("div",{class:"grid"});return e.forEach(function(e){var t=a[e],r=v("ul",{class:"reqs"});t.reqs.forEach(function(a){var t=v("li");if(t.appendChild(v("span",{class:"rl",text:a.label})),a.qty){var o="req:"+e+":"+a.label,n=v("span",{class:"val num"}),i=v("button",{class:"cbtn",type:"button","aria-label":"Diminuir "+a.label,text:"−"}),s=v("button",{class:"cbtn",type:"button","aria-label":"Aumentar "+a.label,text:"+"}),l=a.qty>50?10:1,d=v("button",{class:"cbtn all",type:"button","aria-label":"Marcar "+a.label+" completo",text:"Todos"}),c=function(){var e=Math.min(f(o),a.qty);n.textContent=e+"/"+a.qty,i.disabled=e<=0,s.disabled=e>=a.qty};i.addEventListener("click",function(){h(o,Math.max(0,f(o)-l)),c()}),s.addEventListener("click",function(){h(o,Math.min(a.qty,f(o)+l)),c()}),d.addEventListener("click",function(){h(o,a.qty),c()}),c(),t.appendChild(v("div",{class:"counter"},[i,n,s,d]))}else t.appendChild(v("span",{class:"rt num",text:a.text}));r.appendChild(t)}),o.appendChild(v("article",{class:"card t8"},[v("div",{class:"c-top"},[x(e,40),v("div",{class:"c-id"},[v("h3",{text:e}),v("p",{class:"attrs",text:t.attrs})]),v("span",{class:"pill",text:t.group})]),r]))}),t.appendChild(o),t}();i&&o.appendChild(i);var d=function(){var e=n.goals.filter(function(e){return a[e].ing});if(!e.length)return null;var t=v("div",{class:"tree-root"},e.map(function(e){return v("div",{class:"tree"},[v("ul",null,[G(e,0)])])}));return v("section",{class:"treebox","aria-label":"Árvore completa"},[v("div",{class:"sec-head"},[v("h2",{text:"Árvore completa"}),v("div",{class:"btns"},[v("button",{class:"btn",type:"button",text:"Abrir tudo",onclick:function(){t.querySelectorAll("details").forEach(function(e){e.open=!0})}}),v("button",{class:"btn",type:"button",text:"Recolher",onclick:function(){t.querySelectorAll("details").forEach(function(e){e.open=!1})}})])]),v("p",{class:"sec-desc",text:"Cada linha é 1 livro. Abra um livro para ver os 3 que ele usa, até chegar nos Tier 1."}),t])}();d&&o.appendChild(d),t.appendChild(o),K()}function K(){if(F){var e={},t={done:0,prog:0,none:0},o={},r={},n={};Object.keys(y).forEach(function(e){o[e]=Math.min(f(e),y[e].need)}),Object.keys(y).forEach(function(e){(a[e].ing||[]).forEach(function(a){r[a]=(r[a]||0)+o[e]})}),Object.keys(y).forEach(function(e){n[e]=Math.max(0,o[e]-(r[e]||0))}),Object.keys(y).forEach(function(e){var a=y[e];if(a.stock){var t=r[e]||0;a.stock.textContent="Em estoque: "+n[e]+(t>0?" · "+t+" já usados":"")}if(a.ready){var i=a.need-o[e],s=i,l=[];Object.keys(a.rows).forEach(function(e){var t=a.rows[e],o=i,r=Math.min(n[e],o),d=o>0?r/o*100:100;t.cnt.textContent=o>0?r+"/"+o:"✓";var c=o>0?o:a.need,u=o>0?r:a.need;if(t.bar.children.length!==c){t.bar.textContent="";for(var m=0;m<c;m++)t.bar.appendChild(document.createElement("i"));t.bar.classList.toggle("dense",c>30)}for(var p=0;p<c;p++)t.bar.children[p].classList.toggle("on",p<u);t.li.style.setProperty("--h",R(d).toFixed(1)),t.li.classList.toggle("ok",d>=100),s=Math.min(s,n[e]),0===n[e]&&l.push(e)}),Object.keys(a.rows).forEach(function(e){var t=a.rows[e].li;t.classList.toggle("forge",i>0&&s>0),i>0&&s>0&&t.classList.remove("ok")}),a.ready.className="ready",i<=0?(a.ready.textContent="Livro completo",a.ready.classList.add("fin")):s>0?(a.ready.textContent="Dá para forjar agora: "+s+" de "+i,a.ready.classList.add("go")):a.ready.textContent="Falta: "+l.join(", ")}}),Object.keys(y).forEach(function(a){var o=y[a],r=Math.min(f(a),o.need);e[o.tier]=(e[o.tier]||0)+r,o.val.textContent=r+"/"+o.need;var n=r>=o.need?"done":r>0?"prog":"none";t[n]++,o.el.classList.remove("s-done","s-prog","s-none"),o.el.classList.add("s-"+n),o.el.style.setProperty("--h",R(r/o.need*100).toFixed(1));var i=Math.round(r/o.need*100);o.pct.textContent=i+"%",o.segs.forEach(function(e,a){e.classList.toggle("on",a<r)}),o.pbar.setAttribute("aria-valuenow",String(i)),o.minus.disabled=r<=0,o.plus.disabled=r>=o.need}),D&&Object.keys(t).forEach(function(e){D[e]&&(D[e].textContent=String(t[e]))});var i=0,s=0;Object.keys(P).forEach(function(a){var t=P[a],o=t.total,r=e[a]||0;i+=o,s+=r;var n=o?r/o*100:0;t.bar.style.width=n+"%",t.hdrBar.style.width=n+"%",t.done.textContent=r+"/"+o,t.hdrDone.textContent=r+" de "+o+" feitos"});var l=i?Math.round(s/i*100):0;if(F.pct.textContent=l+"%",F.bar.style.width=l+"%",F.sub.textContent=i?s+" de "+i+" livros fabricados":"Sem livros na árvore",j=e[1]||0,w(),F.matFrag){var d=E.byTier[1]-(e[1]||0),c=d>0?"Ainda a gastar: ":"Todos os Tier 1 já foram feitos";F.matFrag.textContent=d>0?c+m(3*d):c,F.matBlank.textContent=d>0?c+m(4*d):c}}}p("q").addEventListener("input",function(e){d=e.target.value,I()});var U=p("reset"),J=null;function Q(){U.classList.remove("danger"),U.textContent="Zerar progresso desta seleção"}U.addEventListener("click",function(){if(!U.classList.contains("danger"))return U.classList.add("danger"),U.textContent="Confirmar: zerar tudo",void(J=setTimeout(Q,4e3));clearTimeout(J),n.prog[g()]={},c(),Q(),H()});var Y="guia-livros-divinos-tema",Z=p("theme"),$=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null;function _(){var e=document.documentElement.getAttribute("data-theme");return e?"dark"===e:!(!$||!$.matches)}function W(){var e=_();Z.querySelector(".ti").textContent=e?"☀":"☾",Z.querySelector(".tl").textContent=e?"Modo claro":"Modo escuro",Z.setAttribute("aria-label",e?"Mudar para o modo claro":"Mudar para o modo escuro")}try{var X=localStorage.getItem(Y);"dark"!==X&&"light"!==X||document.documentElement.setAttribute("data-theme",X)}catch(e){}Z.addEventListener("click",function(){var e=_()?"light":"dark";document.documentElement.setAttribute("data-theme",e);try{localStorage.setItem(Y,e)}catch(e){}W()}),$&&$.addEventListener&&$.addEventListener("change",W),W();var ee,ae=p("totop");function te(){ae.classList.toggle("show",window.scrollY>500)}window.addEventListener("scroll",te,{passive:!0}),ae.addEventListener("click",function(){var e=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;window.scrollTo({top:0,behavior:e?"auto":"smooth"})}),te(),L(),(ee=p("costs")).textContent="",V.all=v("div",{class:"v num"}),V.left=v("div",{class:"r num"}),V.det=v("div",{class:"r num"}),ee.appendChild(v("div",{class:"sb-h",text:"Preço dos materiais"})),ee.appendChild(O(M,"frag")),ee.appendChild(O(q,"blank")),ee.appendChild(v("div",{class:"cout"},[v("div",{class:"k",text:"Gasto previsto (árvore inteira)"}),V.all,V.left,V.det])),w(),I(),H()}();
+<script>
+var TIER_NAMES = { 1: 'Iniciante', 2: 'Aprendiz', 3: 'Discípulo', 4: 'Especialista', 5: 'Mestre', 6: 'Grão-Mestre', 7: 'Enciclopedista' };
+
+var RECIPES = {};
+function leaf(name, attrs) { RECIPES[name] = { tier: 1, attrs: attrs }; }
+function book(tier, name, ing, attrs) { RECIPES[name] = { tier: tier, ing: ing, attrs: attrs }; }
+function special(name, attrs) { RECIPES[name] = { tier: 7, attrs: attrs, special: true }; }
+function other(name, group, attrs, reqs) { RECIPES[name] = { tier: 8, group: group, attrs: attrs, reqs: reqs }; }
+
+/* Tier 1: Iniciante */
+leaf('Sorriso da Flora', 'Inteligência +5');
+leaf('Rio de Sangue', 'Recuperação de HP +3, Experiência +1%');
+leaf('Orgulho Paterno', 'Constituição +5');
+leaf('Favor do Imperador', 'Destreza +5');
+leaf('Poder Interno', 'Força +5');
+leaf('Chama Kármica', 'Inteligência +4, Constituição +3');
+leaf('Lua da Noite em Chamas', 'Recuperação de MP +3, Experiência +1%');
+leaf('Escudo Primo', 'Força +4, Constituição +3');
+leaf('Pessegueiro', 'Destreza +4, Constituição +3');
+
+/* Tier 2: Aprendiz */
+book(2, 'Lótus Vermelha', ['Sorriso da Flora', 'Chama Kármica', 'Pessegueiro'], 'Inteligência +7, Constituição +6');
+book(2, 'Flor de Pessegueiro', ['Pessegueiro', 'Favor do Imperador', 'Sorriso da Flora'], 'Destreza +10');
+book(2, 'Estampido', ['Orgulho Paterno', 'Escudo Primo', 'Chama Kármica'], 'Constituição +10');
+book(2, 'Lobo da Guerra', ['Rio de Sangue', 'Chama Kármica', 'Escudo Primo'], 'Recuperação de HP +6, Experiência +2%');
+book(2, 'Chuva de Pétalas', ['Pessegueiro', 'Favor do Imperador', 'Orgulho Paterno'], 'Destreza +7, Constituição +6');
+book(2, 'Resiliência', ['Escudo Primo', 'Poder Interno', 'Chama Kármica'], 'Força +10');
+book(2, 'Força Inigualável', ['Escudo Primo', 'Poder Interno', 'Orgulho Paterno'], 'Força +7, Constituição +6');
+book(2, 'Renascido das Chamas', ['Lua da Noite em Chamas', 'Chama Kármica', 'Sorriso da Flora'], 'Recuperação de MP +6, Experiência +2%');
+book(2, 'Chamas Secretas', ['Sorriso da Flora', 'Chama Kármica', 'Poder Interno'], 'Inteligência +10');
+
+/* Tier 3: Discípulo */
+book(3, 'Coração Leal de Gelo', ['Chamas Secretas', 'Flor de Pessegueiro', 'Resiliência'], 'Inteligência +15');
+book(3, 'Portal do Yang', ['Resiliência', 'Força Inigualável', 'Lótus Vermelha'], 'Força +15');
+book(3, 'Beleza Sem Forma', ['Flor de Pessegueiro', 'Força Inigualável', 'Chuva de Pétalas'], 'Destreza +15');
+book(3, 'Canção do Vinho', ['Força Inigualável', 'Estampido', 'Lótus Vermelha'], 'Força +9, Constituição +8');
+book(3, 'Som do Arrependimento', ['Estampido', 'Lótus Vermelha', 'Força Inigualável'], 'Constituição +15');
+book(3, 'Aniquilação', ['Lobo da Guerra', 'Chuva de Pétalas', 'Resiliência'], 'Recuperação de HP +9, Experiência +3%');
+book(3, 'Crepúsculo Eterno', ['Chuva de Pétalas', 'Flor de Pessegueiro', 'Estampido'], 'Destreza +9, Constituição +8');
+book(3, 'Chama Rubra', ['Chamas Secretas', 'Lótus Vermelha', 'Chuva de Pétalas'], 'Inteligência +9, Constituição +8');
+book(3, 'Fragrância da Chuva de Sangue', ['Renascido das Chamas', 'Lótus Vermelha', 'Chuva de Pétalas'], 'Recuperação de MP +9, Experiência +3%');
+
+/* Tier 4: Especialista */
+book(4, 'Espinhos de Rosa', ['Crepúsculo Eterno', 'Beleza Sem Forma', 'Chama Rubra'], 'Destreza +20');
+book(4, 'Destino', ['Portal do Yang', 'Canção do Vinho', 'Beleza Sem Forma'], 'Força +20');
+book(4, 'Encantador de Almas', ['Crepúsculo Eterno', 'Beleza Sem Forma', 'Chama Rubra'], 'Destreza +13, Constituição +12');
+book(4, 'Anarquia', ['Som do Arrependimento', 'Coração Leal de Gelo', 'Canção do Vinho'], 'Constituição +20');
+book(4, 'Tocado pelo Vento da Primavera', ['Chama Rubra', 'Coração Leal de Gelo', 'Som do Arrependimento'], 'Inteligência +20');
+book(4, 'Tigre do Vento, Dragão do Céu', ['Canção do Vinho', 'Portal do Yang', 'Crepúsculo Eterno'], 'Força +13, Constituição +12');
+book(4, 'Céu que Chora', ['Fragrância da Chuva de Sangue', 'Crepúsculo Eterno', 'Som do Arrependimento'], 'Recuperação de MP +12, Experiência +4%');
+book(4, 'Paixão', ['Chama Rubra', 'Coração Leal de Gelo', 'Portal do Yang'], 'Inteligência +13, Constituição +12');
+book(4, 'Ao Sul dos Rios', ['Aniquilação', 'Flor de Pessegueiro', 'Chamas Secretas'], 'Recuperação de HP +9, Experiência +4%');
+
+/* Tier 5: Mestre */
+book(5, 'Floresta Vasta', ['Encantador de Almas', 'Espinhos de Rosa', 'Anarquia'], 'Destreza +13, Constituição +12, Crítico +1%');
+book(5, 'Risada de Loucura', ['Anarquia', 'Tigre do Vento, Dragão do Céu', 'Paixão'], 'Constituição +25');
+book(5, 'Cidade Estrangeira', ['Encantador de Almas', 'Espinhos de Rosa', 'Destino'], 'Destreza +20, Crítico +1%');
+book(5, 'Disfarce de Sangue', ['Tigre do Vento, Dragão do Céu', 'Destino', 'Anarquia'], 'Força +13, Constituição +12, Crítico +1%');
+book(5, 'Júpiter', ['Espinhos de Rosa', 'Encantador de Almas', 'Anarquia'], 'Destreza +13, Constituição +12, Movimento +0,1 m/s');
+book(5, 'Arrogância', ['Tigre do Vento, Dragão do Céu', 'Destino', 'Anarquia'], 'Força +13, Constituição +12, HP +70');
+book(5, 'Os Quatro Grandes Elementos', ['Anarquia', 'Tigre do Vento, Dragão do Céu', 'Destino'], 'Força +20, Crítico +1%');
+book(5, 'Bênçãos da Terra', ['Tigre do Vento, Dragão do Céu', 'Anarquia', 'Paixão'], 'Constituição +20, Redução de dano físico +3%');
+book(5, 'Uivo do Mar', ['Encantador de Almas', 'Tocado pelo Vento da Primavera', 'Espinhos de Rosa'], 'Inteligência +20, Movimento +0,1 m/s');
+book(5, 'Fonte do Deserto', ['Espinhos de Rosa', 'Paixão', 'Tocado pelo Vento da Primavera'], 'Inteligência +13, Constituição +12, Movimento +0,1 m/s');
+book(5, 'Beleza da Serpente', ['Destino', 'Anarquia', 'Encantador de Almas'], 'Força +20, Movimento +0,1 m/s');
+book(5, 'Espelho do Nada', ['Ao Sul dos Rios', 'Céu que Chora', 'Paixão'], 'Força +9, Destreza +9, Constituição +8, Inteligência +9, Crítico +1%');
+book(5, 'Partindo os Céus e a Terra', ['Espinhos de Rosa', 'Encantador de Almas', 'Anarquia'], 'Destreza +25');
+book(5, 'Fragrância dos Céus', ['Paixão', 'Tocado pelo Vento da Primavera', 'Céu que Chora'], 'Inteligência +13, Constituição +12, Tempo de invocação -1%');
+book(5, 'Os Treze Guardiões', ['Ao Sul dos Rios', 'Céu que Chora', 'Paixão'], 'Força +9, Destreza +9, Constituição +8, Inteligência +9, HP +70');
+book(5, 'Água Gentil', ['Paixão', 'Tigre do Vento, Dragão do Céu', 'Tocado pelo Vento da Primavera'], 'Inteligência +20, Crítico +1%');
+
+/* Tier 6: Grão-Mestre */
+book(6, 'Lágrima Vermelha', ['Bênçãos da Terra', 'Os Quatro Grandes Elementos', 'Risada de Loucura'], 'Constituição +6, Redução de dano físico +6%');
+book(6, 'Mudança do Céu e da Terra', ['Arrogância', 'Beleza da Serpente', 'Disfarce de Sangue'], 'Força +13, Constituição +12, Redução de dano físico +6%');
+book(6, 'Ritmo das Ondas', ['Fragrância dos Céus', 'Água Gentil', 'Partindo os Céus e a Terra'], 'Inteligência +13, Constituição +12, Tempo de invocação -2%');
+book(6, 'Três Flores', ['Fragrância dos Céus', 'Cidade Estrangeira', 'Água Gentil'], 'Inteligência +13, Constituição +12, Crítico +2%');
+book(6, 'Coração Furioso', ['Os Quatro Grandes Elementos', 'Cidade Estrangeira', 'Disfarce de Sangue'], 'Força +20, Crítico +2%');
+book(6, 'Zen de Esquecimento', ['Risada de Loucura', 'Júpiter', 'Arrogância'], 'Destreza +13, Constituição +12, HP +140');
+book(6, 'Pan Gu', ['Os Treze Guardiões', 'Disfarce de Sangue', 'Espelho do Nada'], 'Força +9, Destreza +9, Constituição +8, Inteligência +9, Crítico +1%, Tempo de invocação -1%, Intervalo de ataque -0,05');
+book(6, 'Passar Rio com Palha', ['Beleza da Serpente', 'Cidade Estrangeira', 'Partindo os Céus e a Terra'], 'Destreza +20, Movimento +0,2 m/s');
+book(6, 'Dezoito Estudiosos', ['Água Gentil', 'Os Treze Guardiões', 'Beleza da Serpente'], 'Força +9, Destreza +9, Constituição +8, Inteligência +9, HP +70, MP +80');
+book(6, 'Gelo Estrangeiro', ['Uivo do Mar', 'Fonte do Deserto', 'Água Gentil'], 'Inteligência +35');
+book(6, 'Sorriso da Rainha', ['Floresta Vasta', 'Arrogância', 'Disfarce de Sangue'], 'Força +13, Constituição +12, Crítico +2%');
+book(6, 'Água que Perfura a Pedra', ['Risada de Loucura', 'Água Gentil', 'Os Quatro Grandes Elementos'], 'Constituição +20, Crítico +2%');
+book(6, 'Hades de Norte', ['Partindo os Céus e a Terra', 'Uivo do Mar', 'Risada de Loucura'], 'Inteligência +20, Movimento +0,2 m/s');
+book(6, 'Asa Unificadora', ['Partindo os Céus e a Terra', 'Fonte do Deserto', 'Júpiter'], 'Destreza +13, Constituição +12, Movimento +0,2 m/s');
+book(6, 'Vento da Manhã', ['Fonte do Deserto', 'Floresta Vasta', 'Partindo os Céus e a Terra'], 'Destreza +35');
+book(6, 'Segurar a Onda', ['Disfarce de Sangue', 'Beleza da Serpente', 'Arrogância'], 'Força +35');
+
+/* Tier 7: Enciclopedista (sem receita de livros) */
+special('Canto da Noite', 'Força +13, Destreza +13, Constituição +12, Inteligência +13, Crítico +1%, Tempo de invocação -1%, Intervalo de ataque -0,05');
+special('Trompete de Ferro', 'Inteligência +45');
+special('Canto de Dragão da Água', 'Constituição +45');
+special('Uma Bela Flor', 'Destreza +25, Movimento +0,2 m/s');
+special('Deus Erlang', 'Destreza +25, Crítico +2%');
+special('Três Estudiosos', 'Força +45');
+
+/* Outros: clã, casamento, Guerra das Nações */
+var CLAN_COINS = 'Moedas: 91.445.800';
+other('Pergaminho Filial da Vontade', 'Base do clã', 'Força +15', [{ label: 'Mérito', text: '29.030' }, { label: 'Moedas', text: '91.445.800' }]);
+other('Pergaminho Filial do Espírito', 'Base do clã', 'Inteligência +15', [{ label: 'Mérito', text: '29.030' }, { label: 'Moedas', text: '91.445.800' }]);
+other('Pergaminho Filial do Equilíbrio', 'Base do clã', 'Destreza +15', [{ label: 'Mérito', text: '29.030' }, { label: 'Moedas', text: '91.445.800' }]);
+other('Pergaminho Filial da Proteção', 'Base do clã', 'Constituição +15', [{ label: 'Mérito', text: '29.030' }, { label: 'Moedas', text: '91.445.800' }]);
+other('Pergaminho Filial da Sabedoria', 'Base do clã', 'Experiência +2%', [{ label: 'Mérito', text: '13.824' }, { label: 'Moedas', text: '43.545.600' }]);
+
+var MARRY = [{ label: 'Doce Lembrança', qty: 400 }, { label: 'Amor Eterno', qty: 99 }, { label: 'Moedas', text: '5.200.000' }];
+other('Pavão do Sudoeste', 'Casamento', 'Força +11, Destreza +11, Magia +11, Vitalidade +11, Nível de ataque +1, Nível de defesa +1', MARRY);
+other('Romance Ideal', 'Casamento', 'Magia +17, Vitalidade +16, Nível de ataque +2', MARRY);
+other('Desejo da Borboleta', 'Casamento', 'Destreza +17, Vitalidade +16, Nível de defesa +2', MARRY);
+other('Mortal Celestial', 'Casamento', 'Força +17, Vitalidade +16, Nível de defesa +2', MARRY);
+other('Jean Mon', 'Casamento', 'Magia +17, Vitalidade +16, Nível de defesa +2', MARRY);
+other('O Quarto do Lado Oeste', 'Casamento', 'Destreza +17, Vitalidade +16, Nível de defesa +2', MARRY);
+other('A Dama Branca', 'Casamento', 'Força +17, Vitalidade +16, Nível de defesa +2', MARRY);
+
+other('Domínio', 'Guerra das Nações', 'Força +25, Destreza +25, Inteligência +25, Crítico +2%, Tempo de invocação -3%, Intervalo de ataque -0,05, Movimento +0,1 m/s, HP +280', [
+  { label: '1 livro Enciclopedista, à sua escolha', qty: 1 },
+  { label: 'Selo do Soberano', qty: 157 }, { label: 'Ouro de Ébano', qty: 6 }, { label: 'Moedas', text: '30.000.000' }]);
+other('Imperador', 'Guerra das Nações', 'Força +45, Destreza +45, Inteligência +45, Crítico +3%, Tempo de invocação -5%, Intervalo de ataque -0,05, Movimento +0,2 m/s, HP +400', [
+  { label: 'Livro Domínio', qty: 1 },
+  { label: 'Selo do Soberano', qty: 538 }, { label: 'Ouro de Ébano', qty: 24 }, { label: 'Moedas', text: '90.000.000' }]);
+
+function tally(roots) {
+  var need = {}, parents = {};
+  function walk(name, parent) {
+    need[name] = (need[name] || 0) + 1;
+    if (parent) (parents[name] = parents[name] || new Set()).add(parent);
+    (RECIPES[name].ing || []).forEach(function (i) { walk(i, name); });
+  }
+  roots.forEach(function (r) { walk(r, null); });
+  var byTier = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+  Object.keys(need).forEach(function (n) { byTier[RECIPES[n].tier] += need[n]; });
+  return { need: need, parents: parents, byTier: byTier };
+}
+
+function materials(t1Total) {
+  return { fragments: t1Total * 3, blanks: t1Total * 4 };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { RECIPES: RECIPES, TIER_NAMES: TIER_NAMES, tally: tally, materials: materials };
+}
+
+(function () {
+  var CATS = [
+    { id: 'gm', tier: 6, label: 'Grão-Mestre', test: function (r) { return r.tier === 6; } },
+    { id: 'm', tier: 5, label: 'Mestre', test: function (r) { return r.tier === 5; } },
+    { id: 'enc', tier: 7, label: 'Enciclopedista', test: function (r) { return r.tier === 7; } },
+    { id: 'esp', tier: 4, label: 'Especialista', test: function (r) { return r.tier === 4; } },
+    { id: 'disc', tier: 3, label: 'Discípulo', test: function (r) { return r.tier === 3; } },
+    { id: 'apr', tier: 2, label: 'Aprendiz', test: function (r) { return r.tier === 2; } },
+    { id: 'ini', tier: 1, label: 'Iniciante', test: function (r) { return r.tier === 1; } },
+    { id: 'out', label: 'Clã, casamento e guerra', test: function (r) { return r.tier === 8; } }
+  ];
+  var TIER_DESC = {
+    1: 'A base da árvore. Cada livro custa 3 Fragmentos de Escrita Divina e 4 Livros em Branco Divinos.',
+    2: 'Cada livro usa 3 livros de Tier 1.',
+    3: 'Cada livro usa 3 livros de Tier 2.',
+    4: 'Cada livro usa 3 livros de Tier 3. Ao Sul dos Rios é a exceção e leva também 2 de Tier 2.',
+    5: 'Cada livro usa 3 livros de Tier 4.',
+    6: 'Cada livro usa 3 livros de Tier 5. Também dá para forjar direto com um Manuscrito do Destino, obtido em baús ou no Sistema de Chaves.',
+    7: 'Não usam outros livros na receita. Método I: forja direta com um Pergaminho dos Deuses (baús ou Sistema de Chaves). Método II: forje a Loucura do Luar com 1 livro Grão-Mestre mais 1 Escritura Ancestral (baús) e escolha livremente qualquer livro desta lista.'
+  };
+  var STORE = 'guia-livros-divinos-v2';
+  var DEFAULT_GOALS = ['Pan Gu'];
+
+  var state = { goals: DEFAULT_GOALS.slice(), cat: 'gm', prog: {}, prices: { frag: 0, blank: 0 } };
+  try {
+    var s = JSON.parse(localStorage.getItem(STORE));
+    if (s && typeof s === 'object') {
+      if (Array.isArray(s.goals)) state.goals = s.goals.filter(function (g) { return RECIPES[g]; });
+      if (s.cat) state.cat = s.cat;
+      if (s.prog && typeof s.prog === 'object') state.prog = s.prog;
+      if (s.prices && typeof s.prices === 'object') state.prices = { frag: Math.max(0, +s.prices.frag || 0), blank: Math.max(0, +s.prices.blank || 0) };
+    }
+  } catch (e) {}
+  var query = '';
+
+  function persist() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+  function norm(x) { return x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function $(id) { return document.getElementById(id); }
+  function h(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (k.indexOf('on') === 0) e.addEventListener(k.slice(2), v);
+      else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
+    });
+    (kids || []).forEach(function (c) {
+      if (c == null) return;
+      e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+    });
+    return e;
+  }
+
+  function key() { return state.goals.slice().sort().join('|'); }
+  function getProg(k) { return (state.prog[key()] || {})[k] || 0; }
+  function setProg(k, v) {
+    var kk = key();
+    state.prog[kk] = state.prog[kk] || {};
+    state.prog[kk][k] = v;
+    persist();
+  }
+
+  /* ---------- ícones ---------- */
+  function slug(n) { return norm(n).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+  function initials(n) {
+    var w = n.split(/\s+/).filter(function (x) { return x.length > 2 || /^\d/.test(x); });
+    if (!w.length) w = n.split(/\s+/);
+    return (w[0][0] + (w[1] ? w[1][0] : (w[0][1] || ''))).toUpperCase();
+  }
+  function iconRaw(label, file, size, cls) {
+    var box = h('span', { class: 'ico ' + cls, style: '--s:' + size + 'px', 'aria-hidden': 'true' }, [h('span', { class: 'ini', text: initials(label) })]);
+    var img = new Image();
+    img.alt = '';
+    img.onload = function () { box.classList.add('has'); box.appendChild(img); };
+    img.src = 'icons/' + file + '.png';
+    return box;
+  }
+  function icon(name, size) { return iconRaw(name, slug(name), size, 't' + RECIPES[name].tier); }
+  var MAT_FRAG = 'Fragmento de Escrita Divina', MAT_BLANK = 'Livro em Branco Divino';
+
+  /* ---------- menu lateral ---------- */
+  var openCats = {};
+  openCats[state.cat] = true;
+  function namesIn(cat) {
+    return Object.keys(RECIPES).filter(function (n) { return cat.test(RECIPES[n]); });
+  }
+  function tierLabel(r) { return r.tier === 8 ? r.group : 'Tier ' + r.tier + ' · ' + TIER_NAMES[r.tier]; }
+
+  function renderMine() {
+    var box = $('mine');
+    box.textContent = '';
+    box.appendChild(h('div', { class: 'sb-h', text: 'Meus livros' }));
+    if (!state.goals.length) {
+      box.appendChild(h('p', { class: 'hint', text: 'Escolha um ou mais livros na lista abaixo.' }));
+      return;
+    }
+    state.goals.forEach(function (g) {
+      var r = RECIPES[g];
+      box.appendChild(h('div', { class: 'mine-row t' + r.tier }, [
+        icon(g, 36),
+        h('div', { class: 'mt' }, [h('b', { text: g }), h('span', { text: tierLabel(r) })]),
+        h('button', { class: 'rm', type: 'button', 'aria-label': 'Remover ' + g, text: '×', onclick: function () { toggleGoal(g); } })
+      ]));
+    });
+  }
+
+  function bookRow(n) {
+    var r = RECIPES[n];
+    return h('button', {
+      class: 'brow t' + r.tier, type: 'button', 'aria-pressed': state.goals.indexOf(n) >= 0 ? 'true' : 'false',
+      title: r.attrs, onclick: function () { toggleGoal(n); }
+    }, [icon(n, 28), h('span', { class: 'bn' }, [h('span', { class: 'tb', text: r.tier === 8 ? 'Extra' : 'T' + r.tier }), n])]);
+  }
+
+  function renderBooks() {
+    var box = $('books');
+    box.textContent = '';
+    var q = norm(query.trim());
+    if (q) {
+      box.appendChild(h('div', { class: 'sb-h', text: 'Resultado da busca' }));
+      var list = Object.keys(RECIPES).filter(function (n) { return norm(n).indexOf(q) >= 0 || norm(RECIPES[n].attrs).indexOf(q) >= 0; })
+        .sort(function (a, b) { return RECIPES[b].tier - RECIPES[a].tier; });
+      if (!list.length) { box.appendChild(h('p', { class: 'none', text: 'Nenhum livro encontrado.' })); return; }
+      var lb = h('div', { class: 'blist' });
+      list.forEach(function (n) { lb.appendChild(bookRow(n)); });
+      box.appendChild(lb);
+      return;
+    }
+    box.appendChild(h('div', { class: 'sb-h', text: 'Todos os livros' }));
+    CATS.forEach(function (c) {
+      var names = namesIn(c);
+      var sel = names.filter(function (n) { return state.goals.indexOf(n) >= 0; }).length;
+      var det = h('details', { class: 'cat', open: !!openCats[c.id] }, [
+        h('summary', null, [
+          h('span', { class: 'l' + (c.tier ? ' t' + c.tier : '') }, [c.tier ? h('span', { class: 'tb', text: 'T' + c.tier }) : null, c.label]),
+          sel ? h('span', { class: 's num', text: String(sel) }) : null,
+          h('span', { class: 'n num', text: String(names.length) })
+        ])
+      ]);
+      det.addEventListener('toggle', function () { openCats[c.id] = det.open; state.cat = c.id; });
+      var lb = h('div', { class: 'blist' });
+      var lastGroup = null;
+      names.forEach(function (n) {
+        var r = RECIPES[n];
+        if (r.tier === 8 && r.group !== lastGroup) { lastGroup = r.group; lb.appendChild(h('div', { class: 'grp', text: r.group })); }
+        lb.appendChild(bookRow(n));
+      });
+      det.appendChild(lb);
+      box.appendChild(det);
+    });
+  }
+
+  function toggleGoal(n) {
+    var i = state.goals.indexOf(n);
+    if (i >= 0) state.goals.splice(i, 1); else state.goals.push(n);
+    persist();
+    renderMine();
+    renderBooks();
+    renderResults();
+  }
+
+  /* ---------- resultados ---------- */
+  var data, cards, tierRefs, sumRefs, reqRefs, legendRefs;
+  var STATUS = { done: 'Completo', prog: 'Em andamento', none: 'Não iniciado' };
+  /* Matiz de 0 a 100%: 4 (vermelho), 46 (amarelo) em 50%, 140 (verde) em 100%. */
+  function hueFor(pct) { return pct <= 50 ? 4 + (pct / 50) * 42 : 46 + ((pct - 50) / 50) * 94; }
+
+  function tiersPresent() {
+    return [1, 2, 3, 4, 5, 6, 7].filter(function (t) { return data.byTier[t] > 0; });
+  }
+  function namesOfTier(t) {
+    return Object.keys(data.need).filter(function (n) { return RECIPES[n].tier === t; })
+      .sort(function (a, b) { return data.need[b] - data.need[a] || a.localeCompare(b, 'pt'); });
+  }
+
+  function goalPanel() {
+    var bar = h('i');
+    sumRefs = { pct: h('div', { class: 'big num', text: '0%' }), sub: h('div', { class: 'lbl' }), bar: bar };
+    var list = h('div', { class: 'goal-list' }, state.goals.map(function (g) {
+      var r = RECIPES[g];
+      return h('div', { class: 'goal-item t' + r.tier }, [
+        h('span', { class: 'pill', text: tierLabel(r) }),
+        h('h2', { text: g }),
+        h('p', { text: r.attrs })
+      ]);
+    }));
+    return h('section', { class: 'panel goal', 'aria-label': 'Livros escolhidos' }, [
+      list,
+      h('div', { class: 'overall' }, [sumRefs.pct, h('div', { class: 'bar' }, [bar]), sumRefs.sub])
+    ]);
+  }
+
+  function tnavPanel() {
+    var box = $('tnav');
+    box.textContent = '';
+    tierRefs = {};
+    var ts = tiersPresent();
+    if (!ts.length) return;
+    box.appendChild(h('div', { class: 'sb-h', text: 'Progresso por tier' }));
+    ts.forEach(function (t) {
+      var bar = h('i');
+      var done = h('span', { class: 'tdn num' });
+      tierRefs[t] = { done: done, bar: bar, total: data.byTier[t] };
+      box.appendChild(h('button', {
+        class: 'tn-row t' + t, type: 'button',
+        onclick: function () { var el = $('tier-' + t); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      }, [
+        h('span', { class: 'tn-top' }, [h('i', { class: 'dot' }), h('span', { text: 'T' + t + ' · ' + TIER_NAMES[t] }), done]),
+        h('div', { class: 'bar' }, [bar])
+      ]));
+    });
+  }
+
+  function priceInput(label, field) {
+    var inp = h('input', { type: 'text', inputmode: 'numeric', autocomplete: 'off', placeholder: '0', 'aria-label': label });
+    inp.value = state.prices[field] ? String(state.prices[field]) : '';
+    inp.addEventListener('input', function () {
+      var v = parseInt(inp.value.replace(/\D/g, ''), 10);
+      state.prices[field] = isNaN(v) ? 0 : v;
+      persist();
+      updateCost();
+    });
+    return h('label', { class: 'pin' }, [h('span', { class: 'k', text: label }), h('span', { class: 'pw' }, [iconRaw(label, slug(label), 34, 'tm'), inp, h('span', { class: 'cu', text: 'moedas' })])]);
+  }
+
+  var costRefs = {}, doneT1 = 0;
+  function renderCosts() {
+    var box = $('costs');
+    box.textContent = '';
+    costRefs.all = h('div', { class: 'v num' });
+    costRefs.left = h('div', { class: 'r num' });
+    costRefs.det = h('div', { class: 'r num' });
+    box.appendChild(h('div', { class: 'sb-h', text: 'Preço dos materiais' }));
+    box.appendChild(priceInput(MAT_FRAG, 'frag'));
+    box.appendChild(priceInput(MAT_BLANK, 'blank'));
+    box.appendChild(h('div', { class: 'cout' }, [h('div', { class: 'k', text: 'Gasto previsto (árvore inteira)' }), costRefs.all, costRefs.left, costRefs.det]));
+    updateCost();
+  }
+  function updateCost() {
+    if (!costRefs.all) return;
+    var pf = state.prices.frag, pb = state.prices.blank;
+    var t1 = data && data.byTier ? data.byTier[1] : 0;
+    var mm = materials(t1);
+    var leftT1 = Math.max(0, t1 - doneT1);
+    costRefs.all.textContent = fmt(mm.fragments * pf + mm.blanks * pb) + ' moedas';
+    costRefs.det.textContent = fmt(mm.fragments) + ' × ' + fmt(pf) + ' + ' + fmt(mm.blanks) + ' × ' + fmt(pb);
+    costRefs.left.textContent = !t1 ? 'Escolha um livro para calcular' : ((pf || pb) ? 'Ainda a gastar: ' + fmt(leftT1 * 3 * pf + leftT1 * 4 * pb) + ' moedas' : 'Informe os preços para ver o total');
+  }
+
+  function matsPanel() {
+    if (!data.byTier[1]) return null;
+    var m = materials(data.byTier[1]);
+    sumRefs.matFrag = h('div', { class: 'r num' });
+    sumRefs.matBlank = h('div', { class: 'r num' });
+    var total = 0;
+    [1, 2, 3, 4, 5, 6, 7].forEach(function (t) { total += data.byTier[t]; });
+    return h('div', { class: 'stack' }, [
+      h('section', { class: 'mats', 'aria-label': 'Materiais' }, [
+        h('div', { class: 'panel mat mi' }, [iconRaw(MAT_FRAG, slug(MAT_FRAG), 42, 'tm'), h('div', null, [h('div', { class: 'k', text: 'Fragmentos de Escrita Divina' }), h('div', { class: 'v num', text: fmt(m.fragments) }), sumRefs.matFrag])]),
+        h('div', { class: 'panel mat mi' }, [iconRaw(MAT_BLANK, slug(MAT_BLANK), 42, 'tm'), h('div', null, [h('div', { class: 'k', text: 'Livros em Branco Divinos' }), h('div', { class: 'v num', text: fmt(m.blanks) }), sumRefs.matBlank])]),
+        h('div', { class: 'panel mat' }, [h('div', { class: 'k', text: 'Livros a fabricar no total' }), h('div', { class: 'v num', text: String(total) }), h('div', { class: 'r', text: 'Soma de todos os tiers' })])
+      ])
+    ]);
+  }
+
+  /* Ao marcar um livro avançado, os livros usados nele já contam como feitos. */
+  function cascade() {
+    var names = Object.keys(cards).sort(function (x, y) { return RECIPES[y].tier - RECIPES[x].tier; });
+    var used = {};
+    names.forEach(function (n) {
+      var v = Math.min(getProg(n), cards[n].need);
+      var want = Math.min(used[n] || 0, cards[n].need);
+      if (want > v) { setProg(n, want); v = want; }
+      (RECIPES[n].ing || []).forEach(function (x) { used[x] = (used[x] || 0) + v; });
+    });
+  }
+
+  function makeCard(name, t) {
+    var r = RECIPES[name], need = data.need[name];
+    var parents = data.parents[name] ? Array.from(data.parents[name]).sort() : [];
+    var val = h('span', { class: 'val num' });
+    var minus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Diminuir ' + name, text: '−' });
+    var plus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Aumentar ' + name, text: '+' });
+    var all = h('button', { class: 'cbtn all', type: 'button', 'aria-label': 'Marcar todos de ' + name + ' como feitos', text: 'Todos' });
+    var rows = {};
+    var recipeList = r.ing ? h('ul', { class: 'recipe', 'aria-label': 'Ingredientes de ' + name }, r.ing.map(function (i) {
+      var cnt = h('span', { class: 'rc num' });
+      var bar = h('div', { class: 'rbar' });
+      var li = h('li', { class: 't' + RECIPES[i].tier }, [
+        h('div', { class: 'ri' }, [h('span', { class: 'rn', text: '1x ' + i }), cnt]),
+        bar
+      ]);
+      rows[i] = { cnt: cnt, bar: bar, li: li };
+      return li;
+    })) : null;
+    var ready = r.ing ? h('p', { class: 'ready' }) : null;
+    var stock = parents.length ? h('p', { class: 'stock' }) : null;
+    var pctEl = h('span', { class: 'pct num' });
+    var segs = [];
+    for (var si = 0; si < need; si++) segs.push(h('i'));
+    var pbar = h('div', { class: 'pbar' + (need > 30 ? ' dense' : ''), role: 'progressbar', 'aria-label': 'Progresso de ' + name, 'aria-valuemin': '0', 'aria-valuemax': '100' }, segs);
+    var card = h('article', { class: 'card s-none t' + t }, [
+      h('div', { class: 'c-top' }, [
+        icon(name, 40),
+        h('div', { class: 'c-id' }, [h('h3', { text: name }), h('p', { class: 'attrs', text: r.attrs })]),
+        h('span', { class: 'qty num', title: 'Quantidade necessária', text: need + 'x' })
+      ]),
+      recipeList,
+      ready,
+      parents.length ? h('p', { class: 'attrs', text: 'Entra em: ' + parents.join(', ') }) : null,
+      stock,
+      h('div', { class: 'c-foot' }, [h('div', { class: 'counter' }, [minus, val, plus, all]), pctEl]),
+      pbar
+    ]);
+    minus.addEventListener('click', function () { setProg(name, Math.max(0, getProg(name) - 1)); refresh(); });
+    plus.addEventListener('click', function () { setProg(name, Math.min(need, getProg(name) + 1)); cascade(); refresh(); });
+    all.addEventListener('click', function () { setProg(name, need); cascade(); refresh(); });
+    cards[name] = { el: card, val: val, minus: minus, plus: plus, need: need, tier: t, pct: pctEl, segs: segs, pbar: pbar, rows: rows, ready: ready, stock: stock, parents: parents };
+    return card;
+  }
+
+  function tierSections() {
+    var wrap = h('div', { class: 'stack' });
+    legendRefs = {};
+    var legend = h('div', { class: 'legend', role: 'group', 'aria-label': 'Legenda das cores dos cartões' });
+    [['done', 'Completo'], ['prog', 'Em andamento'], ['none', 'Não iniciado']].forEach(function (s) {
+      var n = h('b', { class: 'num', text: '0' });
+      legendRefs[s[0]] = n;
+      legend.appendChild(h('span', { class: 'lg s-' + s[0] }, [h('i', { class: 'dot' }), h('span', { text: s[1] }), n]));
+    });
+    wrap.appendChild(legend);
+    wrap.appendChild(h('details', { class: 'how' }, [
+      h('summary', { text: 'Como funcionam as barrinhas das receitas' }),
+      h('p', { text: 'Dentro de cada receita, a barrinha mostra quanto do seu estoque já cobre aquele livro. O estoque é o que você fez menos o que já gastou nos livros de cima. Ao marcar um livro avançado, os livros usados nele já ficam marcados como feitos. Um mesmo livro pode aparecer em várias receitas e conta inteiro em cada uma, então confira o estoque antes de forjar. Ao marcar um livro avançado que você já tem, os livros usados nele são marcados como feitos automaticamente.' })
+    ]));
+    tiersPresent().forEach(function (t) {
+      var names = namesOfTier(t);
+      var done = h('span', { class: 'sec-meta num' });
+      var bar = h('i');
+      tierRefs[t].hdrDone = done;
+      tierRefs[t].hdrBar = bar;
+      wrap.appendChild(h('section', { class: 'tier-sec t' + t, id: 'tier-' + t }, [
+        h('div', { class: 'sec-head' }, [
+          h('div', { class: 'sec-title' }, [
+            h('h2', { text: 'Tier ' + t + ' · ' + TIER_NAMES[t] }),
+            h('span', { class: 'pill num', text: data.byTier[t] + (data.byTier[t] === 1 ? ' livro' : ' livros') })
+          ]),
+          done
+        ]),
+        h('div', { class: 'bar' }, [bar]),
+        h('p', { class: 'sec-desc', text: TIER_DESC[t] }),
+        h('div', { class: 'grid' }, names.map(function (n) { return makeCard(n, t); }))
+      ]));
+    });
+    return wrap;
+  }
+
+  function reqSections() {
+    var others = state.goals.filter(function (g) { return RECIPES[g].tier === 8; });
+    if (!others.length) return null;
+    var wrap = h('section', { class: 'tier-sec t8', 'aria-label': 'Requisitos extras' }, [
+      h('div', { class: 'sec-head' }, [h('h2', { text: 'Requisitos de clã, casamento e guerra' })]),
+      h('p', { class: 'sec-desc', text: 'Estes livros não usam a árvore de tiers. Marque os itens que você já juntou.' })
+    ]);
+    var grid = h('div', { class: 'grid' });
+    others.forEach(function (g) {
+      var r = RECIPES[g];
+      var ul = h('ul', { class: 'reqs' });
+      r.reqs.forEach(function (rq) {
+        var li = h('li');
+        li.appendChild(h('span', { class: 'rl', text: rq.label }));
+        if (rq.qty) {
+          var k = 'req:' + g + ':' + rq.label;
+          var val = h('span', { class: 'val num' });
+          var minus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Diminuir ' + rq.label, text: '−' });
+          var plus = h('button', { class: 'cbtn', type: 'button', 'aria-label': 'Aumentar ' + rq.label, text: '+' });
+          var step = rq.qty > 50 ? 10 : 1;
+          var fill = h('button', { class: 'cbtn all', type: 'button', 'aria-label': 'Marcar ' + rq.label + ' completo', text: 'Todos' });
+          var upd = function () {
+            var v = Math.min(getProg(k), rq.qty);
+            val.textContent = v + '/' + rq.qty;
+            minus.disabled = v <= 0; plus.disabled = v >= rq.qty;
+          };
+          minus.addEventListener('click', function () { setProg(k, Math.max(0, getProg(k) - step)); upd(); });
+          plus.addEventListener('click', function () { setProg(k, Math.min(rq.qty, getProg(k) + step)); upd(); });
+          fill.addEventListener('click', function () { setProg(k, rq.qty); upd(); });
+          upd();
+          li.appendChild(h('div', { class: 'counter' }, [minus, val, plus, fill]));
+        } else {
+          li.appendChild(h('span', { class: 'rt num', text: rq.text }));
+        }
+        ul.appendChild(li);
+      });
+      grid.appendChild(h('article', { class: 'card t8' }, [
+        h('div', { class: 'c-top' }, [icon(g, 40), h('div', { class: 'c-id' }, [h('h3', { text: g }), h('p', { class: 'attrs', text: r.attrs })]), h('span', { class: 'pill', text: r.group })]),
+        ul
+      ]));
+    });
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  function treeNode(name, depth) {
+    var r = RECIPES[name];
+    var label = h('span', { class: 'tn t' + r.tier }, [h('b', { text: '1x' }), h('span', { text: name }), h('em', { text: 'T' + r.tier })]);
+    if (!r.ing) return h('li', null, [h('div', { class: 'leaf' }, [label])]);
+    return h('li', null, [h('details', { open: depth < 2 }, [
+      h('summary', null, [label]),
+      h('ul', null, r.ing.map(function (i) { return treeNode(i, depth + 1); }))
+    ])]);
+  }
+
+  function treePanel() {
+    var roots = state.goals.filter(function (g) { return RECIPES[g].ing; });
+    if (!roots.length) return null;
+    var tree = h('div', { class: 'tree-root' }, roots.map(function (r) {
+      return h('div', { class: 'tree' }, [h('ul', null, [treeNode(r, 0)])]);
+    }));
+    return h('section', { class: 'treebox', 'aria-label': 'Árvore completa' }, [
+      h('div', { class: 'sec-head' }, [
+        h('h2', { text: 'Árvore completa' }),
+        h('div', { class: 'btns' }, [
+          h('button', { class: 'btn', type: 'button', text: 'Abrir tudo', onclick: function () { tree.querySelectorAll('details').forEach(function (d) { d.open = true; }); } }),
+          h('button', { class: 'btn', type: 'button', text: 'Recolher', onclick: function () { tree.querySelectorAll('details').forEach(function (d) { d.open = false; }); } })
+        ])
+      ]),
+      h('p', { class: 'sec-desc', text: 'Cada linha é 1 livro. Abra um livro para ver os 3 que ele usa, até chegar nos Tier 1.' }),
+      tree
+    ]);
+  }
+
+  function renderResults() {
+    var box = $('results');
+    box.textContent = '';
+    cards = {}; tierRefs = {}; sumRefs = null;
+    if (!state.goals.length) {
+      data = null; doneT1 = 0; updateCost();
+      $('tnav').textContent = '';
+      box.appendChild(h('div', { class: 'panel' }, [h('h2', { text: 'Nenhum livro escolhido' }), h('p', { class: 'sec-desc', text: 'Escolha um livro no menu à esquerda para ver a árvore, as quantidades e marcar o progresso. Você pode escolher vários ao mesmo tempo.' })]));
+      return;
+    }
+    data = tally(state.goals);
+    doneT1 = 0;
+    tnavPanel();
+    var wrap = h('div', { class: 'stack' });
+    wrap.appendChild(goalPanel());
+    var mats = matsPanel();
+    if (mats) wrap.appendChild(mats);
+    wrap.appendChild(tierSections());
+    var rq = reqSections();
+    if (rq) wrap.appendChild(rq);
+    var tp = treePanel();
+    if (tp) wrap.appendChild(tp);
+    box.appendChild(wrap);
+    refresh();
+  }
+
+  function refresh() {
+    if (!sumRefs) return;
+    var doneBy = {};
+    var counts = { done: 0, prog: 0, none: 0 };
+    /* Estoque de cada livro = quantos você fez menos os que já foram gastos nos livros de cima. */
+    var made = {}, used = {}, stockOf = {};
+    Object.keys(cards).forEach(function (n) { made[n] = Math.min(getProg(n), cards[n].need); });
+    Object.keys(cards).forEach(function (p) {
+      (RECIPES[p].ing || []).forEach(function (x) { used[x] = (used[x] || 0) + made[p]; });
+    });
+    Object.keys(cards).forEach(function (n) { stockOf[n] = Math.max(0, made[n] - (used[n] || 0)); });
+    Object.keys(cards).forEach(function (n) {
+      var c = cards[n];
+      if (c.stock) {
+        var u = used[n] || 0;
+        c.stock.textContent = 'Em estoque: ' + stockOf[n] + (u > 0 ? ' · ' + u + ' já usados' : '');
+      }
+      if (!c.ready) return;
+      var R = c.need - made[n];
+      var can = R;
+      var missing = [];
+      Object.keys(c.rows).forEach(function (x) {
+        var row = c.rows[x];
+        var req = R, cover = Math.min(stockOf[x], req);
+        var fr = req > 0 ? (cover / req) * 100 : 100;
+        row.cnt.textContent = req > 0 ? cover + '/' + req : '✓';
+        var nseg = req > 0 ? req : c.need, non = req > 0 ? cover : c.need;
+        if (row.bar.children.length !== nseg) {
+          row.bar.textContent = '';
+          for (var q = 0; q < nseg; q++) row.bar.appendChild(document.createElement('i'));
+          row.bar.classList.toggle('dense', nseg > 30);
+        }
+        for (var q2 = 0; q2 < nseg; q2++) row.bar.children[q2].classList.toggle('on', q2 < non);
+        row.li.style.setProperty('--h', hueFor(fr).toFixed(1));
+        row.li.classList.toggle('ok', fr >= 100);
+        can = Math.min(can, stockOf[x]);
+        if (stockOf[x] === 0) missing.push(x);
+      });
+      Object.keys(c.rows).forEach(function (x) {
+        var li = c.rows[x].li;
+        li.classList.toggle('forge', R > 0 && can > 0);
+        if (R > 0 && can > 0) li.classList.remove('ok');
+      });
+      c.ready.className = 'ready';
+      if (R <= 0) { c.ready.textContent = 'Livro completo'; c.ready.classList.add('fin'); }
+      else if (can > 0) { c.ready.textContent = 'Dá para forjar agora: ' + can + ' de ' + R; c.ready.classList.add('go'); }
+      else { c.ready.textContent = 'Falta: ' + missing.join(', '); }
+    });
+    Object.keys(cards).forEach(function (n) {
+      var c = cards[n], v = Math.min(getProg(n), c.need);
+      doneBy[c.tier] = (doneBy[c.tier] || 0) + v;
+      c.val.textContent = v + '/' + c.need;
+      var st = v >= c.need ? 'done' : (v > 0 ? 'prog' : 'none');
+      counts[st]++;
+      c.el.classList.remove('s-done', 's-prog', 's-none');
+      c.el.classList.add('s-' + st);
+      c.el.style.setProperty('--h', hueFor((v / c.need) * 100).toFixed(1));
+      var p = Math.round((v / c.need) * 100);
+      c.pct.textContent = p + '%';
+      c.segs.forEach(function (sg, k) { sg.classList.toggle('on', k < v); });
+      c.pbar.setAttribute('aria-valuenow', String(p));
+      c.minus.disabled = v <= 0;
+      c.plus.disabled = v >= c.need;
+    });
+    if (legendRefs) Object.keys(counts).forEach(function (k) { if (legendRefs[k]) legendRefs[k].textContent = String(counts[k]); });
+    var total = 0, done = 0;
+    Object.keys(tierRefs).forEach(function (t) {
+      var ref = tierRefs[t], tot = ref.total, d = doneBy[t] || 0;
+      total += tot; done += d;
+      var pct = tot ? (d / tot) * 100 : 0;
+      ref.bar.style.width = pct + '%';
+      ref.hdrBar.style.width = pct + '%';
+      ref.done.textContent = d + '/' + tot;
+      ref.hdrDone.textContent = d + ' de ' + tot + ' feitos';
+    });
+    var pctAll = total ? Math.round((done / total) * 100) : 0;
+    sumRefs.pct.textContent = pctAll + '%';
+    sumRefs.bar.style.width = pctAll + '%';
+    sumRefs.sub.textContent = total ? done + ' de ' + total + ' livros fabricados' : 'Sem livros na árvore';
+    doneT1 = doneBy[1] || 0;
+    updateCost();
+    if (sumRefs.matFrag) {
+      var left = data.byTier[1] - (doneBy[1] || 0);
+      var msg = left > 0 ? 'Ainda a gastar: ' : 'Todos os Tier 1 já foram feitos';
+      sumRefs.matFrag.textContent = left > 0 ? msg + fmt(left * 3) : msg;
+      sumRefs.matBlank.textContent = left > 0 ? msg + fmt(left * 4) : msg;
+    }
+  }
+
+  /* ---------- eventos ---------- */
+  $('q').addEventListener('input', function (e) {
+    query = e.target.value;
+    renderBooks();
+  });
+
+  var resetBtn = $('reset'), resetTimer = null;
+  function restoreReset() { resetBtn.classList.remove('danger'); resetBtn.textContent = 'Zerar progresso desta seleção'; }
+  resetBtn.addEventListener('click', function () {
+    if (!resetBtn.classList.contains('danger')) {
+      resetBtn.classList.add('danger');
+      resetBtn.textContent = 'Confirmar: zerar tudo';
+      resetTimer = setTimeout(restoreReset, 4000);
+      return;
+    }
+    clearTimeout(resetTimer);
+    state.prog[key()] = {};
+    persist();
+    restoreReset();
+    renderResults();
+  });
+
+  var THEME_KEY = 'guia-livros-divinos-tema';
+  var themeBtn = $('theme');
+  var darkMq = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+  function isDark() {
+    var t = document.documentElement.getAttribute('data-theme');
+    return t ? t === 'dark' : !!(darkMq && darkMq.matches);
+  }
+  function paintTheme() {
+    var d = isDark();
+    themeBtn.querySelector('.ti').textContent = d ? '\u2600' : '\u263E';
+    themeBtn.querySelector('.tl').textContent = d ? 'Modo claro' : 'Modo escuro';
+    themeBtn.setAttribute('aria-label', d ? 'Mudar para o modo claro' : 'Mudar para o modo escuro');
+  }
+  try { var saved = localStorage.getItem(THEME_KEY); if (saved === 'dark' || saved === 'light') document.documentElement.setAttribute('data-theme', saved); } catch (e) {}
+  themeBtn.addEventListener('click', function () {
+    var next = isDark() ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    paintTheme();
+  });
+  if (darkMq && darkMq.addEventListener) darkMq.addEventListener('change', paintTheme);
+  paintTheme();
+
+  var topBtn = $('totop');
+  function onScroll() { topBtn.classList.toggle('show', window.scrollY > 500); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  topBtn.addEventListener('click', function () {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
+  onScroll();
+
+  renderMine();
+  renderCosts();
+  renderBooks();
+  renderResults();
+})();
+
 </script>
 </body>
 </html>
