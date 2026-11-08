@@ -36,7 +36,7 @@
   --font-mono:'Chakra Petch',ui-sans-serif,system-ui,sans-serif;
   --font-body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
   --well2:var(--well2); --well3:#12151a; --t0:#fff; --t1:var(--t1); --t2:var(--t2); --t3:var(--t3); --t4:var(--t4);
-  --btn-ink:var(--btn-ink); --fill:var(--fill); --dng:var(--dng); --dngb:var(--dngb); --dngh:var(--dngh); --pr-ink:var(--pr-ink);
+  --btn-ink:var(--btn-ink); --fill:transparent; --dng:#e5707a; --dngb:rgba(229,112,122,.45); --dngh:#e5707a; --pr-ink:var(--pr-ink);
   --okc:#3fbf6f; --mixw:white; --cmix:100%; --acc-b:#f2c53d; --tg-d:#f0b429; --tg-r:#ef6b6b; --tg-b:#5aa7ff;
   color-scheme:dark;
 }
@@ -236,6 +236,9 @@ button.cell:hover{border-color:var(--accent-line)}
 .mnote{font-size:13px;color:var(--t3)}
 .mnote.src{margin-top:6px;padding:7px 10px;border-radius:5px;background:var(--fill);color:var(--t1);font-size:14px;display:flex;flex-direction:column;gap:5px}
 .src .sline{display:flex;flex-wrap:wrap;align-items:center;gap:3px 9px}
+.md{font:600 11px var(--font-mono);white-space:nowrap;letter-spacing:.02em;color:var(--ink);border:1px solid var(--accent-line,var(--line));background:rgba(242,197,61,.08);padding:1px 7px;border-radius:3px}
+.md.q{border-color:rgba(79,208,255,.55);background:rgba(79,208,255,.10);color:var(--ink)}
+.src .alt small{font:500 10px var(--font-mono);color:var(--ink-dim);margin-left:3px}
 .src .ep{font:700 12px var(--font-mono);color:#06101a;background:var(--cc,#4fd0ff);padding:1px 8px;border-radius:3px}
 .src .lv{font-size:13px;color:var(--t3)}
 .src .alts{gap:4px 6px}
@@ -257,6 +260,11 @@ button.cell:hover{border-color:var(--accent-line)}
 .dkline b{font:700 14px var(--font-mono);padding:2px 9px;border-radius:4px}
 .dkline b.gr{background:var(--cc);color:#06101a}
 .dkline b.gs{border:2px dashed var(--cc);color:color-mix(in srgb,var(--cc) var(--cmix),black)}
+.dk small{font:600 9.5px var(--font-mono);letter-spacing:.02em;opacity:.85;text-align:center;line-height:1.2;margin-top:1px}
+.dklist{display:flex;flex-direction:column;gap:6px;width:100%}
+.dkd{display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px}
+.dkd b{min-width:44px;text-align:center}
+.dkd .tr{font-size:13px;color:var(--t2)}
 .dkline .dim{color:var(--t4);font-size:12.5px}
 .dkline .okk{color:var(--okc);font-weight:600}
 .src .sl{font:600 11.5px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--cc) var(--cmix),black)}
@@ -281,6 +289,8 @@ button.cell:hover{border-color:var(--accent-line)}
 .pact{display:flex;align-items:center;gap:6px}
 .xbtn,.x{width:26px;height:26px;border-radius:5px;border:1px solid var(--line);font:500 14px/1 var(--font-mono);color:var(--ink-dim)}
 .x:hover{border-color:var(--dngh);color:var(--dng)}
+.mcount .x{margin-left:6px;border-color:var(--dngb);color:var(--dng);background:rgba(229,72,77,.08);font-size:16px}
+.mcount .x:hover{background:var(--dngb);border-color:var(--dngh)}
 .xbtn:hover{border-color:var(--accent-line);color:var(--ink)}
 .steps{margin:10px 0 0 48px;display:flex;flex-direction:column;gap:6px}
 .step{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;align-items:start;padding:8px 10px;border:1px solid var(--line-soft);border-radius:6px;background:var(--surface-2)}
@@ -460,8 +470,9 @@ const load=()=>{try{
   const o=JSON.parse(localStorage.getItem('dusk-tracker-v2'));
   if(o&&o.equipped&&o.inv&&o.furn)return {furn:o.furn,group:o.group,inv:o.inv,watch:o.watch||[],cur:0,sets:[{name:'Principal',equipped:o.equipped},{name:'Secundário',equipped:{}}]};
 }catch(e){}return null};
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({furn:S.furn,group:S.group,sets:S.sets,cur:S.cur,inv:S.inv,watch:S.watch}))}catch(e){}};
-const S=Object.assign({sel:null,confirm:false,confirmDel:-1,open:{},watch:[]},load()||sample());
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({furn:S.furn,group:S.group,sets:S.sets,cur:S.cur,inv:S.inv,watch:S.watch,wq:S.wq}))}catch(e){}};
+const S=Object.assign({sel:null,confirm:false,confirmDel:-1,open:{},watch:[],wq:{}},load()||sample());
+if(!S.wq||typeof S.wq!=='object')S.wq={};
 if(!GROUPS[S.furn]){S.furn='arma';S.group='Espadas'}
 if(S.group&&GROUPS[S.furn].indexOf(S.group)<0)S.group=GROUPS[S.furn][0];
 S.sets.forEach(s=>{Object.keys(s.equipped).forEach(k=>{if(!ITEM[s.equipped[k].id])delete s.equipped[k]})});
@@ -483,12 +494,9 @@ ITEMS.forEach(it=>{if(it.ic)ICAT[icKey(it,it.p)]=it.ic});
 const refreshIcons=()=>ITEMS.forEach(it=>{if(it.p==null)return;const k=icKey(it,it.p),ic=ICAT[ICM[k]||k];if(ic)it.ic=ic});
 Object.keys(POS).forEach(id=>{if(ITEM[id]&&typeof POS[id]==='number')ITEM[id].p=POS[id]});
 refreshIcons();
-S.adj=null;
 /* Receitas editadas no modo "Editar receita".
    FIXES: ajustes permanentes; cole aqui o texto gerado pelo modo de edição, ex.: const FIXES={"id-da-peca":{"n":"Nome","m":[["Material",5]],"e":9}};
    REC: ajustes salvos no navegador (valem por cima de FIXES). */
-let EDFLAG=false;try{EDFLAG=localStorage.getItem('dusk-editor')==='1'}catch(e){}
-const EDITOR=EDFLAG||/[?&#]editar/.test(location.search+location.hash); /* ferramentas de ajuste manual: só aparecem com ?editar no endereço */
 const FIXES={};
 /* Renomeações de materiais: mantém salvos antigos (estoque, edições) funcionando */
 const RENAMES={'Chifre de Sela de Shenwu':'Chifre de Sela Primordial'};
@@ -502,9 +510,7 @@ Object.keys(FIXES).forEach(id=>applyRec(id,FIXES[id]));
 const ORIGREC={};ITEMS.forEach(it=>{ORIGREC[it.id]={n:it.n,m:it.m.map(x=>[x[0],x[1]]),e:it.e}});
 Object.keys(REC).forEach(id=>applyRec(id,REC[id]));
 ITEMS.forEach(i=>i.m.forEach(x=>{if(MIDX[x[0]]===undefined){MIDX[x[0]]=ALLM.length;ALLM.push(x[0])}}));
-S.edit=false;
 const saveRec=()=>{try{localStorage.setItem(RECKEY,JSON.stringify(REC))}catch(e){}};
-const touchRec=it=>{REC[it.id]={n:it.n,m:it.m.map(x=>[x[0],x[1]]),e:it.e};saveRec()};
 const savePos=()=>{try{localStorage.setItem(POSKEY,JSON.stringify(POS));localStorage.setItem(ICKEY,JSON.stringify(ICM))}catch(e){}};
 let C=null,drag=null,confirmTimer=null,delTimer=null,bagTimer=null;
 
@@ -547,25 +553,6 @@ function calc(){
 }
 
 /* ---------- Forja ---------- */
-function editHTML(sel){
-  const opts=cur=>ALLM.filter(n=>n!==ESS).map(n=>'<option value="'+MIDX[n]+'"'+(n===cur?' selected':'')+'>'+esc(n)+'</option>').join('');
-  const rows=sel.m.map((x,i)=>'<div class="erow"><span class="msi sm">'+matIcon(x[0])+'</span>'
-    +'<select class="esel" id="rec-n-'+i+'" data-rec="mname" data-i="'+i+'" aria-label="Material '+(i+1)+'">'+opts(x[0])+'</select>'
-    +'<input class="num" id="rec-q-'+i+'" type="number" min="0" data-rec="mq" data-i="'+i+'" value="'+x[1]+'" aria-label="Quantidade de '+esc(x[0])+'">'
-    +'<button class="x" data-act="recdel" data-i="'+i+'" aria-label="Remover '+esc(x[0])+'">×</button></div>').join('');
-  const edited=!!REC[sel.id],nrec=Object.keys(REC).length;
-  return '<div class="edit">'
-    +'<label class="elab" for="rec-name">Nome da peça</label><input class="etxt" id="rec-name" data-rec="n" value="'+esc(sel.n)+'">'
-    +'<div class="elab">Materiais (quantidade por forja)</div>'+rows
-    +(sel.m.length<7?'<div><button class="btn sm ghost" data-act="recadd">+ Material</button></div>':'')
-    +'<div class="erow"><span class="msi sm">'+matIcon(ESS)+'</span><span class="elab nb">Essência do Crepúsculo</span><input class="num" id="rec-e" type="number" min="0" data-rec="e" value="'+sel.e+'" aria-label="Essências"><span></span></div>'
-    +'<div class="acts"><button class="btn sm ghost" data-act="recreset"'+(edited?'':' disabled')+'>Restaurar esta peça</button></div>'
-    +'<div class="elab">Edições salvas ('+nrec+' peça'+(nrec===1?'':'s')+')</div>'
-    +'<textarea class="adjout" readonly rows="3" aria-label="Edições para copiar" onfocus="this.select()">'+esc(JSON.stringify(REC))+'</textarea>'
-    +'<p class="hint">Para tornar permanente no arquivo, copie o texto acima e cole em <b>const FIXES=</b> no começo do script do index.html.</p>'
-    +(nrec?'<div><button class="btn sm ghost" data-act="recresetall">Desfazer todas as edições</button></div>':'')
-    +'</div>';
-}
 const BAG=64;
 const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 function canForge(it){
@@ -615,17 +602,12 @@ function forgeHTML(){
   +'<div class="tabs" role="group" aria-label="Fornalhas">'+FURN.map(f=>'<span class="tw"><button class="tab'+(f.id===S.furn?' on':'')+'" data-act="furn" data-id="'+f.id+'" aria-pressed="'+(f.id===S.furn)+'">'+f.name+'</button></span>').join('')+'</div>'
   +'<div class="groups" role="group" aria-label="Categorias">'+GROUPS[S.furn].map(g=>'<button class="gp'+(g===S.group?' on':'')+'" data-act="group" data-g="'+esc(g)+'" aria-pressed="'+(g===S.group)+'">'+esc(g)+'</button>').join('')+'</div>'
   +'<div class="fgrid">'+cells+'</div>'
-  +(!EDITOR?'':'<div class="adjbar"><button class="btn sm ghost'+(S.adj==='item'?' on':'')+'" data-act="adj" data-m="item" aria-pressed="'+(S.adj==='item')+'">'+(S.adj==='item'?'Terminar itens':'Ajustar itens')+'</button>'
-  +'<button class="btn sm ghost'+(S.adj==='img'?' on':'')+'" data-act="adj" data-m="img" aria-pressed="'+(S.adj==='img')+'">'+(S.adj==='img'?'Terminar imagens':'Ajustar imagens')+'</button></div>')
-  +(EDITOR&&S.adj==='item'?'<p class="hint adjhint">Modo itens: selecione uma peça e clique em outra para trocar nome e receita de lugar. As imagens ficam onde estão.</p>':'')
-  +(EDITOR&&S.adj==='img'?'<p class="hint adjhint">Modo imagens: selecione uma peça e clique em outra para trocar só as imagens. Nome e receita ficam onde estão.</p>':'')
-  +(EDITOR&&S.adj?'<textarea class="adjout" readonly rows="3" aria-label="Ajustes para copiar" onfocus="this.select()">'+esc(JSON.stringify({itens:POS,imagens:ICM}))+'</textarea><button class="btn sm ghost" data-act="adjreset">Desfazer todos os ajustes</button>':'')
   +'<div class="fdetail">'
   +'<div class="selname'+(sel?'':' none')+'">'+(sel?esc(sel.n)+' <small>'+(sel.nr?'SEM RECEITA':'NV '+sel.l+(sel.au?' · DOURADA':''))+'</small>':'Selecione uma peça na grade')+'</div>'
   +(sel&&(typeTxt||sel.st)?'<p class="meta">'+esc(typeTxt)+(sel.st?(typeTxt?' · ':'')+esc(sel.st):'')+'</p>':'')
-  +(sel?(EDITOR&&S.edit?editHTML(sel):'<div class="mslots">'+slots+'</div>'):'')
+  +(sel?'<div class="mslots">'+slots+'</div>':'')
   +(soulTxt?'<p class="souls">'+soulTxt+'</p>':'')
-  +'<div class="acts"><button class="btn" data-act="equip"'+(sel&&!same&&!sel.nr?'':' disabled')+'>'+(same?'Equipada':'Equipar')+'</button><button class="btn ghost" data-act="cancel"'+(sel?'':' disabled')+'>Cancelar</button>'+(EDITOR?'<button class="btn ghost'+(S.edit?' on':'')+'" data-act="edit" aria-pressed="'+S.edit+'"'+(sel?'':' disabled')+'>'+(S.edit?'Terminar edição':'Editar receita')+'</button>':'')+'</div>'
+  +'<div class="acts"><button class="btn" data-act="equip"'+(sel&&!same&&!sel.nr?'':' disabled')+'>'+(same?'Equipada':'Equipar')+'</button><button class="btn ghost" data-act="cancel"'+(sel?'':' disabled')+'>Cancelar</button>'+'</div>'
   +'</div>';
 }
 
@@ -670,6 +652,9 @@ function invHTML(){
 const CHC={1:'#f2c53d',2:'#ff9a3c',3:'#ff6fae'};
 const EPC={1:['#ffa3a3','#ff6b6b','#ef4444'],2:['#a3e6a3','#52d273','#2fb35a'],3:['#8ff3e8','#2fd8c8','#14b8ad']};
 const epCol=(ch,ep)=>EPC[ch][ep-1];
+const modeTxt=m=>(m||'').replace('/',' / ');
+const qtdTxt=m=>m==='Grupo'?'Alta':'Médio / Alta';
+const modeChips=m=>'<span class="md" title="Modo necessário para este chefe">'+esc(modeTxt(m))+'</span><span class="md q" title="Quantidade de Boss necessária (modo Alto gasta Essência)">Qtde Boss: '+qtdTxt(m)+'</span>';
 function srcLine(n){
   const s=SRC[n];
   if(!s)return n===ESS?'<div class="sline"><span class="sl" style="--cc:#f2c53d">Como fazer</span><span class="tr">5 Tábua Polida + 5 Carvão de Pedra + 5 Pó de Esmeril + 5 Aço Temperado</span></div>':'<div class="sline"><span class="sl" style="--cc:#8d97a5">Origem</span><span class="tr">não identificada na tabela de drops</span></div>';
@@ -677,9 +662,10 @@ function srcLine(n){
   s.forEach(x=>{const k=x.boss+'|'+x.ch+'|'+x.tier;if(seen.indexOf(k)<0){seen.push(k);uniq.push(x)}});
   const f=uniq[0],cc=CHC[f.ch],rest=uniq.slice(1);
   let h='<div class="sline"><span class="sl" style="--cc:#4fd0ff">Onde farmar</span><span class="cp" style="--cc:'+cc+'">Cap. '+f.ch+'</span><span class="tr">'+esc(T[f.ch-1].name)+'</span></div>'
-    +'<div class="sline"><span class="ep" style="--cc:'+epCol(f.ch,f.tier)+'">Episódio '+f.tier+'</span><b>'+esc(f.boss)+'</b><span class="tr lv">'+esc(T[f.ch-1].tiers[f.tier-1])+'</span></div>';
+    +'<div class="sline"><span class="ep" style="--cc:'+epCol(f.ch,f.tier)+'">Episódio '+f.tier+'</span><b>'+esc(f.boss)+'</b><span class="tr lv">'+esc(T[f.ch-1].tiers[f.tier-1])+'</span></div>'
+    +'<div class="sline">'+modeChips(f.mode)+'</div>';
   if(rest.length){
-    h+='<div class="sline alts"><span class="more">Também em:</span>'+rest.slice(0,4).map(x=>'<span class="alt" style="--cc:'+epCol(x.ch,x.tier)+'" title="'+esc('Cap. '+x.ch+' · '+T[x.ch-1].name+' · Episódio '+x.tier+' · '+x.boss)+'">'+x.ch+'-'+x.tier+' <i>'+esc(x.boss)+'</i></span>').join('')+(rest.length>4?'<span class="more">+'+(rest.length-4)+'</span>':'')+'</div>';
+    h+='<div class="sline alts"><span class="more">Também em:</span>'+rest.slice(0,4).map(x=>'<span class="alt" style="--cc:'+epCol(x.ch,x.tier)+'" title="'+esc('Cap. '+x.ch+' · '+T[x.ch-1].name+' · Episódio '+x.tier+' · '+x.boss+' · '+modeTxt(x.mode)+' · Qtde Boss: '+qtdTxt(x.mode))+'">'+x.ch+'-'+x.tier+' <i>'+esc(x.boss)+'</i> <small>'+esc(modeTxt(x.mode))+'</small></span>').join('')+(rest.length>4?'<span class="more">+'+(rest.length-4)+'</span>':'')+'</div>';
   }
   return h;
 }
@@ -701,25 +687,28 @@ function dusksHTML(placed){
     const best=Object.keys(sc).sort((a,b)=>sc[b]-sc[a]||(a<b?-1:1))[0];
     sug[best]=1;left=left.filter(m=>m.cs.indexOf(best)<0);
   }
+  const binfo=k=>{const g={};(all[k]||[]).forEach(m=>SRC[m.n].forEach(x=>{if(x.ch+'-'+x.tier!==k)return;const a=g[x.mode]=g[x.mode]||[];if(a.indexOf(x.boss)<0)a.push(x.boss)}));
+    return Object.keys(g).sort((a,b)=>a.length-b.length).map(m=>({mode:m,bosses:g[m]}))};
   const chap=[1,2,3].map(ch=>{
     const cells=[1,2,3].map(ep=>{
       const k=ch+'-'+ep,list=all[k]||[],cls=req[k]?'req':sug[k]?'sug':'none';
-      const tip='Cap. '+ch+' · '+T[ch-1].name+' · Episódio '+ep+' ('+T[ch-1].tiers[ep-1]+')'+(list.length?' — faltam: '+list.map(m=>m.n+' ×'+m.q).join(', '):' — nada a farmar aqui');
-      return '<div class="dk '+cls+'" style="--cc:'+epCol(ch,ep)+'" title="'+esc(tip)+'"><b>'+k+'</b><span>'+(list.length&&cls!=='none'?list.length+(list.length>1?' mats':' mat'):'—')+'</span></div>';
+      const tip='Cap. '+ch+' · '+T[ch-1].name+' · Episódio '+ep+' ('+T[ch-1].tiers[ep-1]+')'+(list.length?' — faltam: '+list.map(m=>m.n+' ×'+m.q).join(', ')+' — '+binfo(k).map(g=>g.mode.replace('/',' / ')+' · Qtde Boss: '+(g.mode==='Grupo'?'Alta':'Médio / Alta')+' ('+g.bosses.join(', ')+')').join('; '):' — nada a farmar aqui');
+      return '<div class="dk '+cls+'" style="--cc:'+epCol(ch,ep)+'" title="'+esc(tip)+'"><b>'+k+'</b><span>'+(list.length&&cls!=='none'?list.length+(list.length>1?' mats':' mat'):'—')+'</span>'+(list.length&&cls!=='none'?'<small>'+(binfo(k).every(g=>g.mode==='Grupo')?'Grupo':binfo(k).some(g=>g.mode==='Grupo')?'Misto':'Solo/Grupo')+'</small>':'')+'</div>';
     }).join('');
     return '<div class="dkch" style="--cc:'+CHC[ch]+'"><div class="dkh">Cap. '+ch+'<small>'+esc(T[ch-1].name)+'</small></div><div class="dkr">'+cells+'</div></div>';
   }).join('');
-  const go=Object.keys(req).sort().map(k=>'<b class="gr" style="--cc:'+epCol(+k[0],+k[2])+'">'+k+'</b>').concat(Object.keys(sug).sort().map(k=>'<b class="gs" style="--cc:'+epCol(+k[0],+k[2])+'" title="Sugerida: cobre materiais que dropam em mais de um lugar">'+k+'</b>'));
+  const dkrow=(k,c,ttl)=>binfo(k).map((g,i)=>'<div class="dkd"><b class="'+c+'" style="--cc:'+epCol(+k[0],+k[2])+'"'+(ttl?' title="'+ttl+'"':'')+'>'+k+'</b>'+modeChips(g.mode)+'<span class="tr">'+g.bosses.map(esc).join(', ')+'</span></div>').join('');
+  const go=Object.keys(req).sort().map(k=>dkrow(k,'gr','')).concat(Object.keys(sug).sort().map(k=>dkrow(k,'gs','Sugerida: cobre materiais que dropam em mais de um lugar')));
   let line;
   if(!placed)line='<span class="dim">Coloque peças no personagem para ver onde farmar.</span>';
   else if(!go.length)line='<span class="okk">Nenhuma Dusk pendente: os materiais já estão completos.</span>';
-  else line='<span class="lab">Faltam ir em:</span> '+go.join('')+'<span class="dim">Sólido = só dropa ali · contorno = sugerida</span>';
+  else line='<span class="lab">Faltam ir em:</span><div class="dklist">'+go.join('')+'</div><span class="dim">Sólido = só dropa ali · contorno = sugerida</span>';
   return '<h2 class="sh sub" style="--cc:#4fd0ff"><span>Dusks que faltam</span><small>capítulo-episódio</small></h2><div class="dusks">'+chap+'</div><div class="dkline">'+line+'</div>';
 }
 function mrow(n){
-  const have=S.inv[n]||0,need=C.need[n]||0,tot=C.total[n]||0;
+  const have=S.inv[n]||0,wq=S.watch.indexOf(n)>=0?(S.wq[n]||0):0,need=(C.need[n]||0)+wq,tot=C.total[n]||0;
   let st,note,pct,use=true;
-  if(need>0){pct=Math.min(have/need,1);st=stat(pct,false);note=have>need?'sobram '+(have-need):have===need?'na medida':'faltam '+(need-have)}
+  if(need>0){pct=Math.min(have/need,1);st=stat(pct,false);note=(have>need?'sobram '+(have-need):have===need?'na medida':'faltam '+(need-have))+(wq?' · inclui meta de '+wq:'')}
   else if(tot>0){pct=1;st=stat(1,true);note='as peças que usam já foram forjadas'}
   else{pct=0;st={c:COL.dim,t:'Sem uso agora'};note='nenhuma peça equipada usa';use=false}
   const r=rar(n),tag=(r==='d'||r==='r'||r==='b')?'<span class="tag '+r+'">'+RTXT[r]+'</span>':'';
@@ -730,7 +719,7 @@ function mrow(n){
     +'<div class="mcount"><button class="sbtn" data-act="istep" data-m="'+MIDX[n]+'" data-d="-1" aria-label="Diminuir '+esc(n)+'">−</button>'
     +'<input class="num" id="inv-'+MIDX[n]+'" data-m="'+MIDX[n]+'" type="number" min="0" value="'+have+'" inputmode="numeric" aria-label="'+esc(n)+' no inventário">'
     +'<button class="sbtn" data-act="istep" data-m="'+MIDX[n]+'" data-d="1" aria-label="Aumentar '+esc(n)+'">+</button>'
-    +'<span class="need" title="Necessário">/ '+(need||'—')+'</span></div></li>'};
+    +'<span class="need" title="Necessário">/ '+(need||'—')+'</span>'+(S.watch.indexOf(n)>=0?'<button class="x" data-act="unwatch" data-m="'+MIDX[n]+'" aria-label="Parar de acompanhar '+esc(n)+'" title="Parar de acompanhar">×</button>':'')+'</div></li>'};
 }
 function trackerHTML(){
   const pc=C.pieces,placed=Object.keys(pc).length;
@@ -761,7 +750,7 @@ function trackerHTML(){
   }).join('');
   const ess=mrow(ESS).html;
   const avail=ALLM.filter(n=>n!==ESS&&names.indexOf(n)<0);
-  const sel='<div class="addrow"><select id="addmat" aria-label="Material para acompanhar">'+avail.map(n=>'<option value="'+MIDX[n]+'">'+esc(n)+'</option>').join('')+'</select><button class="btn sm" data-act="addmat"'+(avail.length?'':' disabled')+'>Acompanhar</button></div>';
+  const sel='<div class="bagadd"><div class="combo"><span class="cico'+(S.wtm==null?' none':'')+'">'+(S.wtm==null?'&#8981;':matIcon(ALLM[S.wtm]))+'</span><input id="wtm" type="text" autocomplete="off" spellcheck="false" placeholder="Pesquisar item para acompanhar…" value="'+(S.wtm==null?'':esc(ALLM[S.wtm]))+'" aria-label="Material para acompanhar"><div class="clist" id="wtlist" hidden>'+ALLM.map((n,i)=>n===ESS?'':'<button type="button" data-act="wtpick" data-m="'+i+'" data-k="'+esc(norm(n))+'"><span class="ci">'+matIcon(n)+'</span><span class="cn">'+esc(n)+'</span>'+(S.watch.indexOf(n)>=0?'<span class="cq">meta ×'+(S.wq[n]||0)+'</span>':'')+'</button>').join('')+'<div class="cnone" hidden>Nenhum material encontrado.</div></div></div><input id="wtq" type="number" min="1" inputmode="numeric" value="'+(S.wtq||1)+'" aria-label="Quantidade a acompanhar"><button class="btn sm" data-act="wtadd">Acompanhar</button></div>';
   const prows=ORDER.map(sl=>{
     const p=pc[sl],nm=SLOT_BY[sl].name;
     if(!p)return '<li class="piece ghost"><div class="phead"><span class="pic">'+svg(G[sl==='weapon'?'sword':sl])+'</span><div class="pmain"><div class="mtop"><b>'+nm+'</b><em>Vazio</em></div><div class="mnote">Escolha na Forja uma peça para este slot.</div></div><div></div></div></li>';
@@ -785,7 +774,7 @@ function trackerHTML(){
   +'<div class="facts"><div><span>No personagem</span><b>'+placed+'</b></div><div><span>Etapas prontas</span><b>'+stepsReady+'</b></div><div><span>Forjadas</span><b>'+crafted+'</b></div><div><span>Essências faltando</span><b>'+missEss+'</b></div></div></div>'
   +dusksHTML(placed)
   +'<h2 class="sh sub"><span>Essência do Crepúsculo</span><small>gasta em toda forja de Dusk e por chefes em modo Alto</small></h2><ul>'+ess+'</ul>'
-  +secHTML+sel
+  +sel+secHTML
   +'<h2 class="sh sub"><span>Peças no personagem</span></h2><ul>'+prows+'</ul>'
   +'<p class="note">Cada peça avançada exige a Alma da peça anterior, então a lista mostra a cadeia completa na ordem de forja. Marque "Alma pronta" nas etapas que você já tem. O estoque é o que você digita; marcar uma etapa não desconta materiais. Os materiais são distribuídos pelas etapas na ordem da lista, da primeira à última peça.</p>';
 }
@@ -823,7 +812,9 @@ function slotClick(slot){
   const sel=S.sel&&ITEM[S.sel];
   if(sel&&slotAccepts(sel,slot)){equipItem(sel.id,slot);return}
   const e=S.equipped[slot];
-  if(e){const it=ITEM[e.id];S.furn=it.f;S.group=it.g;S.sel=it.id}
+  if(e){const it=ITEM[e.id];S.furn=it.f;S.group=it.g;S.sel=it.id;save();return}
+  const k=slot==='ring2'?'ring':slot,f=ITEMS.find(i=>i.s===k);
+  if(f){S.furn=f.f;S.group=f.g;S.sel=null;save()}
 }
 const mname=el=>ALLM[Number(el.dataset.m)];
 function useSet(i){S.cur=i;S.equipped=S.sets[i].equipped;S.confirmDel=-1}
@@ -837,19 +828,8 @@ document.addEventListener('click',e=>{
     case 'group':S.group=el.dataset.g;S.sel=null;save();break;
     case 'tile':{
       const a=S.sel&&ITEM[S.sel],b=ITEM[el.dataset.id];
-      if(S.adj&&a&&b&&a.id!==b.id&&a.f===b.f&&a.g===b.g){
-        if(S.adj==='item'){const pa=a.p,pb=b.p;a.p=pb;b.p=pa;POS[a.id]=pb;POS[b.id]=pa}
-        else{const ka=icKey(a,a.p),kb=icKey(b,b.p),sa=ICM[ka]||ka,sb=ICM[kb]||kb;ICM[ka]=sb;ICM[kb]=sa}
-        refreshIcons();savePos();S.sel=null;
-      }else S.sel=el.dataset.id;
+      S.sel=el.dataset.id;
       break}
-    case 'edit':S.edit=!S.edit;break;
-    case 'recdel':{const it=S.sel&&ITEM[S.sel];if(it){it.m.splice(Number(el.dataset.i),1);touchRec(it)}break}
-    case 'recadd':{const it=S.sel&&ITEM[S.sel];if(it){const free=ALLM.filter(n=>n!==ESS&&!it.m.some(x=>x[0]===n))[0];if(free){it.m.push([free,1]);touchRec(it)}}break}
-    case 'recreset':{const it=S.sel&&ITEM[S.sel];if(it&&ORIGREC[it.id]){const o=ORIGREC[it.id];it.n=o.n;it.m=o.m.map(x=>[x[0],x[1]]);it.e=o.e;delete REC[it.id];saveRec()}break}
-    case 'recresetall':try{localStorage.removeItem(RECKEY)}catch(_){}location.reload();return;
-    case 'adj':S.adj=S.adj===el.dataset.m?null:el.dataset.m;break;
-    case 'adjreset':try{localStorage.removeItem(POSKEY);localStorage.removeItem(ICKEY)}catch(e){}location.reload();return;
     case 'equip':if(S.sel)equipItem(S.sel);break;
     case 'cancel':S.sel=null;break;
     case 'slot':slotClick(el.dataset.slot);break;
@@ -879,8 +859,16 @@ document.addEventListener('click',e=>{
       if(S.bagm==null&&mi&&mi.value.trim()){const k=norm(mi.value.trim());const f=ALLM.findIndex(x=>norm(x).indexOf(k)>=0);if(f>=0)S.bagm=f}
       const n=S.bagm==null?null:ALLM[S.bagm],v=Math.max(1,parseInt(q&&q.value,10)||1);
       if(n){S.bagq=v;
-        if((S.inv[n]||0)>0||Object.keys(S.inv).filter(k=>S.inv[k]>0).length<BAG){S.inv[n]=(S.inv[n]||0)+v;S.bagm=null;save()}}
+        if((S.inv[n]||0)>0||Object.keys(S.inv).filter(k=>S.inv[k]>0).length<BAG){S.inv[n]=(S.inv[n]||0)+v;save()}}
       break}
+    case 'wtpick':{try{document.activeElement.blur()}catch(_){}const q=document.getElementById('wtq');if(q)S.wtq=Math.max(1,parseInt(q.value,10)||1);S.wtm=Number(el.dataset.m);break}
+    case 'wtadd':{
+      const q=document.getElementById('wtq'),mi=document.getElementById('wtm');
+      if(S.wtm==null&&mi&&mi.value.trim()){const k=norm(mi.value.trim());const f=ALLM.findIndex(x=>x!==ESS&&norm(x).indexOf(k)>=0);if(f>=0)S.wtm=f}
+      const n=S.wtm==null?null:ALLM[S.wtm],v=Math.max(1,parseInt(q&&q.value,10)||1);
+      if(n){S.wtq=v;if(S.watch.indexOf(n)<0)S.watch.push(n);S.wq[n]=(S.wq[n]||0)+v;save()}
+      break}
+    case 'unwatch':{const n=ALLM[Number(el.dataset.m)];S.watch=S.watch.filter(x=>x!==n);delete S.wq[n];save();break}
     case 'addmat':{const s=document.getElementById('addmat');if(s&&s.value!==''){const n=ALLM[Number(s.value)];if(S.watch.indexOf(n)<0)S.watch.push(n);save()}break}
     case 'stack':{
       const inp=document.getElementById('inv-'+el.dataset.m);
@@ -892,12 +880,6 @@ document.addEventListener('click',e=>{
   render();
 });
 
-/* Atalho do editor sem mexer no endereço: digite "editar" fora de campos de texto (digite de novo para desligar). */
-(function(){let buf='';document.addEventListener('keydown',e=>{
-  const tg=e.target;if(tg&&(tg.tagName==='INPUT'||tg.tagName==='TEXTAREA'||tg.tagName==='SELECT'))return;
-  if(e.key.length!==1)return;buf=(buf+e.key.toLowerCase()).slice(-6);
-  if(buf==='editar'){try{localStorage.setItem('dusk-editor',EDFLAG?'0':'1')}catch(_){}location.reload()}
-})})();
 document.addEventListener('dblclick',e=>{
   const el=e.target.closest('[data-act="slot"]');
   if(el&&S.equipped[el.dataset.slot]){delete S.equipped[el.dataset.slot];save();render()}
@@ -906,23 +888,25 @@ document.addEventListener('dblclick',e=>{
 document.addEventListener('change',e=>{
   const t=e.target;
   if(t.id==='bagq')S.bagq=Math.max(1,parseInt(t.value,10)||1);
+  if(t.id==='wtq')S.wtq=Math.max(1,parseInt(t.value,10)||1);
 });
-function bagFilter(all){
-  const inp=document.getElementById('bagm'),list=document.getElementById('baglist');if(!inp||!list)return;
+function bagFilter(all,pf){
+  pf=pf||'bag';const inp=document.getElementById(pf==='bag'?'bagm':'wtm'),list=document.getElementById(pf==='bag'?'baglist':'wtlist');if(!inp||!list)return;
   const q=all?'':norm(inp.value.trim());let vis=0,first=null;
   list.querySelectorAll('button').forEach(b=>{const ok=!q||b.dataset.k.indexOf(q)>=0;b.hidden=!ok;b.classList.remove('hl');if(ok){vis++;if(!first)first=b}});
   if(first)first.classList.add('hl');
   list.querySelector('.cnone').hidden=vis>0;
 }
 document.addEventListener('focusin',e=>{
-  if(e.target.id==='bagm'){const l=document.getElementById('baglist');e.target.select();bagFilter(true);if(l)l.hidden=false}
+  const pf=e.target.id==='bagm'?'bag':e.target.id==='wtm'?'wt':null;
+  if(pf){const l=document.getElementById(pf==='bag'?'baglist':'wtlist');e.target.select();bagFilter(true,pf);if(l)l.hidden=false}
 });
 document.addEventListener('click',e=>{
-  if(!e.target.closest('.combo')){const l=document.getElementById('baglist');if(l)l.hidden=true}
+  if(!e.target.closest('.combo')){['baglist','wtlist'].forEach(id=>{const l=document.getElementById(id);if(l)l.hidden=true})}
 });
 document.addEventListener('keydown',e=>{
-  if(e.target.id!=='bagm')return;
-  const l=document.getElementById('baglist');if(!l)return;
+  if(e.target.id!=='bagm'&&e.target.id!=='wtm')return;
+  const l=document.getElementById(e.target.id==='bagm'?'baglist':'wtlist');if(!l)return;
   const vis=[...l.querySelectorAll('button:not([hidden])')];
   if(e.key==='Escape'){l.hidden=true;e.target.blur();return}
   if(e.key==='ArrowDown'||e.key==='ArrowUp'){
@@ -937,15 +921,7 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='bagm'){const l=document.getElementById('baglist');if(l)l.hidden=false;bagFilter();return}
-  if(t.dataset&&t.dataset.rec){
-    const it=S.sel&&ITEM[S.sel];if(!it)return;
-    const k=t.dataset.rec,i=Number(t.dataset.i);
-    if(k==='n'){if(t.value.trim())it.n=t.value}
-    else if(k==='e')it.e=Math.max(0,parseInt(t.value,10)||0);
-    else if(k==='mq'&&it.m[i])it.m[i][1]=Math.max(0,parseInt(t.value,10)||0);
-    else if(k==='mname'&&it.m[i]){const nn=ALLM[Number(t.value)];if(nn)it.m[i][0]=nn}
-    touchRec(it);render();return;
-  }
+  if(t.id==='wtm'){const l=document.getElementById('wtlist');if(l)l.hidden=false;bagFilter(false,'wt');return}
   if(t.dataset&&t.dataset.m!==undefined&&t.tagName==='INPUT'){S.inv[ALLM[Number(t.dataset.m)]]=Math.max(0,parseInt(t.value,10)||0);save();render()}
 });
 
