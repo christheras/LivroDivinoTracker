@@ -472,9 +472,11 @@ if(!S.sel){const d=byName('Ponta Demoníaca','arma');S.sel=d?d.id:null}
    POS: id do item -> posição na grade (troca de item)
    ICM: posição -> imagem exibida nela (troca de imagem) */
 const POSKEY='dusk-tracker-pos',ICKEY='dusk-tracker-img';
-let POS={},ICM={};
-try{POS=JSON.parse(localStorage.getItem(POSKEY))||{}}catch(e){POS={}}
-try{ICM=JSON.parse(localStorage.getItem(ICKEY))||{}}catch(e){ICM={}}
+/* AJUSTES: trocas permanentes de posição e imagem. Cole aqui o texto gerado em "Ajustar itens/imagens" (modo ?editar), ex.: const AJUSTES={"itens":{},"imagens":{}}; */
+const AJUSTES={"itens":{},"imagens":{"armadura|Armadura|2":"armadura|Armadura|5","armadura|Armadura|5":"armadura|Armadura|2","armadura|Armadura|10":"armadura|Armadura|13","armadura|Armadura|13":"armadura|Armadura|10","armadura|Armadura|18":"armadura|Armadura|21","armadura|Armadura|21":"armadura|Armadura|18"}};
+let POS=Object.assign({},AJUSTES.itens),ICM=Object.assign({},AJUSTES.imagens);
+try{POS=Object.assign(POS,JSON.parse(localStorage.getItem(POSKEY))||{})}catch(e){}
+try{ICM=Object.assign(ICM,JSON.parse(localStorage.getItem(ICKEY))||{})}catch(e){}
 const icKey=(it,p)=>it.f+'|'+it.g+'|'+p;
 const ICAT={};
 ITEMS.forEach(it=>{if(it.ic)ICAT[icKey(it,it.p)]=it.ic});
@@ -485,7 +487,8 @@ S.adj=null;
 /* Receitas editadas no modo "Editar receita".
    FIXES: ajustes permanentes; cole aqui o texto gerado pelo modo de edição, ex.: const FIXES={"id-da-peca":{"n":"Nome","m":[["Material",5]],"e":9}};
    REC: ajustes salvos no navegador (valem por cima de FIXES). */
-const EDITOR=/[?&#]editar/.test(location.search+location.hash); /* ferramentas de ajuste manual: só aparecem com ?editar no endereço */
+let EDFLAG=false;try{EDFLAG=localStorage.getItem('dusk-editor')==='1'}catch(e){}
+const EDITOR=EDFLAG||/[?&#]editar/.test(location.search+location.hash); /* ferramentas de ajuste manual: só aparecem com ?editar no endereço */
 const FIXES={};
 /* Renomeações de materiais: mantém salvos antigos (estoque, edições) funcionando */
 const RENAMES={'Chifre de Sela de Shenwu':'Chifre de Sela Primordial'};
@@ -889,6 +892,12 @@ document.addEventListener('click',e=>{
   render();
 });
 
+/* Atalho do editor sem mexer no endereço: digite "editar" fora de campos de texto (digite de novo para desligar). */
+(function(){let buf='';document.addEventListener('keydown',e=>{
+  const tg=e.target;if(tg&&(tg.tagName==='INPUT'||tg.tagName==='TEXTAREA'||tg.tagName==='SELECT'))return;
+  if(e.key.length!==1)return;buf=(buf+e.key.toLowerCase()).slice(-6);
+  if(buf==='editar'){try{localStorage.setItem('dusk-editor',EDFLAG?'0':'1')}catch(_){}location.reload()}
+})})();
 document.addEventListener('dblclick',e=>{
   const el=e.target.closest('[data-act="slot"]');
   if(el&&S.equipped[el.dataset.slot]){delete S.equipped[el.dataset.slot];save();render()}
