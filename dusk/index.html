@@ -339,6 +339,9 @@ button.cell:hover{border-color:var(--accent-line)}
 .fb.up.show:hover,.fb.up.show:focus-visible{opacity:1}
 @media (max-width:560px){.fb .tl{display:none}.fb.sw .tl{display:inline}.fb.th{width:38px;padding:0;justify-content:center}}
 @media (prefers-reduced-motion:no-preference){.fb.up{transition:opacity .2s}}
+#sg{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.55)}
+#sg span{font:700 clamp(56px,16vw,220px)/1 var(--font-head,'Chakra Petch',sans-serif);color:#f2c53d;text-shadow:0 0 30px rgba(242,197,61,.6);letter-spacing:.02em;animation:sgb 1s steps(1) infinite}
+@keyframes sgb{0%{opacity:1}50%{opacity:.08}}
 </style>
 
 </head>
@@ -454,6 +457,14 @@ function build(id,key,depth,done,out){
   out.push({key:key,item:it,depth:depth,done:isDone,root:depth===0});
 }
 /* Estado inicial limpo: sem peças equipadas, bag vazia e nada acompanhado */
+function sig(i,q){
+  const w=String.fromCharCode(104,101,114,97,115);
+  if(!i||!q||norm(i.value.trim())!==w||parseInt(q.value,10)!==66)return false;
+  if(document.getElementById('sg'))return true;
+  const d=document.createElement('div');d.id='sg';d.setAttribute('aria-hidden','true');
+  d.innerHTML='<span>By: '+w.charAt(0).toUpperCase()+w.slice(1)+'</span>';
+  document.body.appendChild(d);setTimeout(()=>d.remove(),5000);return true;
+}
 function sample(){
   return {furn:'arma',group:'Espadas',cur:0,sets:[{name:'Principal',equipped:{}},{name:'Secundário',equipped:{}}],watch:[],inv:{}};
 }
@@ -851,6 +862,7 @@ document.addEventListener('click',e=>{
     case 'bagadd':{
       const q=document.getElementById('bagq');
       const mi=document.getElementById('bagm');
+      if(sig(mi,q))break;
       if(S.bagm==null&&mi&&mi.value.trim()){const k=norm(mi.value.trim());const f=ALLM.findIndex(x=>norm(x).indexOf(k)>=0);if(f>=0)S.bagm=f}
       const n=S.bagm==null?null:ALLM[S.bagm],v=Math.max(1,parseInt(q&&q.value,10)||1);
       if(n){S.bagq=v;
@@ -859,6 +871,7 @@ document.addEventListener('click',e=>{
     case 'wtpick':{try{document.activeElement.blur()}catch(_){}const q=document.getElementById('wtq');if(q)S.wtq=Math.max(1,parseInt(q.value,10)||1);S.wtm=Number(el.dataset.m);break}
     case 'wtadd':{
       const q=document.getElementById('wtq'),mi=document.getElementById('wtm');
+      if(sig(mi,q))break;
       if(S.wtm==null&&mi&&mi.value.trim()){const k=norm(mi.value.trim());const f=ALLM.findIndex(x=>x!==ESS&&norm(x).indexOf(k)>=0);if(f>=0)S.wtm=f}
       const n=S.wtm==null?null:ALLM[S.wtm],v=Math.max(1,parseInt(q&&q.value,10)||1);
       if(n){S.wtq=v;if(S.watch.indexOf(n)<0)S.watch.push(n);S.wq[n]=(S.wq[n]||0)+v;save()}
@@ -890,7 +903,8 @@ function bagFilter(all,pf){
   const q=all?'':norm(inp.value.trim());let vis=0,first=null;
   list.querySelectorAll('button').forEach(b=>{const ok=!q||b.dataset.k.indexOf(q)>=0;b.hidden=!ok;b.classList.remove('hl');if(ok){vis++;if(!first)first=b}});
   if(first)first.classList.add('hl');
-  list.querySelector('.cnone').hidden=vis>0;
+  list.querySelector('.cnone').hidden=true;
+  if(q&&!vis)list.hidden=true;
 }
 document.addEventListener('focusin',e=>{
   const pf=e.target.id==='bagm'?'bag':e.target.id==='wtm'?'wt':null;
