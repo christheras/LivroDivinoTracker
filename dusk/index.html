@@ -453,16 +453,9 @@ function build(id,key,depth,done,out){
   if(!isDone)it.so.forEach((sid,i)=>build(sid,key+'>'+i+':'+sid,depth+1,done,out));
   out.push({key:key,item:it,depth:depth,done:isDone,root:depth===0});
 }
+/* Estado inicial limpo: sem peças equipadas, bag vazia e nada acompanhado */
 function sample(){
-  const w=byName('Ponta Demoníaca','arma'),b=byName('Armadura Pesada do Tigre','armadura'),h=byName('Bracelete Pesada Poshan','armadura'),n=byName('Colar do Sol Flamejante','acessorio');
-  const eq={};
-  const ws=[];build(w.id,w.id,0,{},ws);
-  eq.weapon={id:w.id,done:{[ws[0].key]:true}};
-  eq.body={id:b.id,done:{}};
-  eq.hands={id:h.id,done:{[h.id]:true}};
-  eq.neck={id:n.id,done:{}};
-  return {furn:'arma',group:'Espadas',cur:0,sets:[{name:'Principal',equipped:eq},{name:'Secundário',equipped:{}}],watch:[],
-    inv:{[ESS]:15,'Caveira das Charadas':24,'Fragmento da Armadura Qin Tian':5,'Fragmento da Armadura Dourada':5,'Antiga Espada Ornamental':20,'Garra do Devorador':8,'Garras do Leão Insano':3,'Pedra do Lar':10,'Sangue da Serpente Ancestral':0}};
+  return {furn:'arma',group:'Espadas',cur:0,sets:[{name:'Principal',equipped:{}},{name:'Secundário',equipped:{}}],watch:[],inv:{}};
 }
 const load=()=>{try{
   const s=JSON.parse(localStorage.getItem(KEY));
@@ -478,7 +471,6 @@ if(S.group&&GROUPS[S.furn].indexOf(S.group)<0)S.group=GROUPS[S.furn][0];
 S.sets.forEach(s=>{Object.keys(s.equipped).forEach(k=>{if(!ITEM[s.equipped[k].id])delete s.equipped[k]})});
 if(!(S.cur>=0&&S.cur<S.sets.length))S.cur=0;
 S.equipped=S.sets[S.cur].equipped;
-if(!S.sel){const d=byName('Ponta Demoníaca','arma');S.sel=d?d.id:null}
 /* Ajustes feitos pelo usuário, guardados no navegador:
    POS: id do item -> posição na grade (troca de item)
    ICM: posição -> imagem exibida nela (troca de imagem) */
@@ -594,7 +586,7 @@ function forgeHTML(){
     while(parts.length<8)parts.push(blank);
     slots=parts.join('');
   }
-  const same=!!(sel&&slotOn(sel));
+  const same=!!(sel&&slotsOf(sel).every(x=>S.equipped[x]&&S.equipped[x].id===sel.id));
   const soulTxt=sel&&sel.nr?'Receita ainda não cadastrada: só o ícone da fornalha foi mapeado.':sel&&sel.so.length?'Alma obtida desmontando '+sel.so.map(id=>esc(ITEM[id].n)).join(', ')+' ('+fu.prof.toLowerCase()+').':'';
   const typeTxt=sel?[sel.g,sel.t&&sel.t!==sel.g?sel.t:''].filter(Boolean).join(' · '):'';
   return ''
@@ -802,9 +794,12 @@ function render(){
 /* ---------- Ações ---------- */
 function equipItem(id,slot){
   const it=ITEM[id];if(!it||!it.s||it.nr)return;
-  if(slotOn(it))return;
+  const holds=x=>!!(S.equipped[x]&&S.equipped[x].id===id),ls=slotsOf(it);
+  if(ls.every(holds))return; /* já ocupa todos os slots que aceita (anéis: pode repetir nos dois) */
   let sl=slotAccepts(it,slot)?slot:null;
-  if(!sl)sl=it.s==='ring'?(!S.equipped.ring?'ring':!S.equipped.ring2?'ring2':'ring'):it.s;
+  if(sl&&holds(sl))sl=ls.find(x=>!holds(x))||null;
+  if(!sl)sl=it.s==='ring'?(!S.equipped.ring?'ring':!S.equipped.ring2?'ring2':ls.find(x=>!holds(x))):it.s;
+  if(!sl)return;
   S.equipped[sl]={id:id,done:{}};
   save();
 }
