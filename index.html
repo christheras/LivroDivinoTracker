@@ -39,8 +39,8 @@ footer a{color:inherit}
   <a class="go" id="ir" href="https://christheras.github.io/PWTools-Guides/">Ir para o novo endereço</a>
   <p class="sub" id="cont">Você será levado automaticamente em <b id="seg">10</b> s. <button type="button" id="parar">Ficar nesta página</button></p>
   <div class="links">
-    <a href="https://christheras.github.io/PWTools-Guides/livros/index.html">Livros Divinos</a>
-    <a href="https://christheras.github.io/PWTools-Guides/dusk/index.html">Dusk</a>
+    <a href="https://christheras.github.io/PWTools-Guides/livros/">Livros Divinos</a>
+    <a href="https://christheras.github.io/PWTools-Guides/dusk/">Dusk</a>
   </div>
   <noscript><p class="sub">Atualize seus favoritos para <a href="https://christheras.github.io/PWTools-Guides/">https://christheras.github.io/PWTools-Guides/</a>.</p></noscript>
 </main>
@@ -52,7 +52,7 @@ footer a{color:inherit}
   var BASE = 'https://christheras.github.io/PWTools-Guides/';
   /* O endereço antigo servia o tracker de Livros na raiz e o de Dusk em /dusk/ */
   var dusk = /\/dusk(\/|$)/i.test(location.pathname);
-  var alvo = BASE + (dusk ? 'dusk/index.html' : 'livros/index.html');
+  var alvo = BASE + (dusk ? 'dusk/' : 'livros/');
   var ir = document.getElementById('ir');
   ir.href = alvo;
   ir.textContent = dusk ? 'Abrir o Dusk Tracker no novo endereço' : 'Abrir os Livros Divinos no novo endereço';
