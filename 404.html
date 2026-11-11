@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PW Tools mudou de endereço</title>
+<meta name="description" content="Os trackers de Perfect World (Livros Divinos e Dusk) agora ficam em um novo endereço.">
+<link rel="canonical" href="https://christheras.github.io/PWTools-Guides/">
+<style>
+:root{--bg:#0e1013;--card:#171a1f;--line:#2b3038;--ink:#e8e6df;--dim:#9aa0a8;--accent:#f2c53d;--accent-ink:#1a1405}
+:root[data-pw-theme="light"]{--bg:#f4f2ec;--card:#fff;--line:#cfcabd;--ink:#1d1f23;--dim:#555b64;--accent:#9a6b00;--accent-ink:#fff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:72px 16px 32px;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.fb{position:fixed;top:14px;right:14px;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:600 13px system-ui,sans-serif;cursor:pointer;opacity:.85}
+.fb:hover{opacity:1}
+main{width:100%;max-width:520px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px 24px;text-align:center}
+h1{margin:0 0 10px;font-size:22px;color:var(--accent)}
+p{margin:0 0 14px;color:var(--dim)}
+.url{display:block;margin:14px 0 18px;padding:10px 12px;border:1px dashed var(--line);border-radius:8px;color:var(--ink);font:600 14px ui-monospace,Consolas,monospace;word-break:break-all;text-decoration:none}
+.go{display:inline-block;padding:12px 22px;border-radius:8px;background:var(--accent);color:var(--accent-ink);font-weight:700;text-decoration:none}
+.go:hover{filter:brightness(1.08)}
+.sub{margin-top:16px;font-size:13.5px}
+.sub button{background:none;border:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
+.links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.links a{font-size:13.5px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 12px;text-decoration:none}
+.links a:hover{border-color:var(--accent)}
+footer{font-size:12.5px;color:var(--dim);text-align:center}
+footer a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<button class="fb" id="theme" type="button"><span aria-hidden="true">&#9728;</span><span class="tl">Tema claro</span></button>
+
+<main>
+  <h1>Mudamos de endereço</h1>
+  <p>Os trackers de Perfect World (Livros Divinos e Dusk) agora ficam em um site novo, o <strong>PW Tools</strong>. Este endereço antigo não será mais atualizado.</p>
+  <span class="url" id="alvo">christheras.github.io/PWTools-Guides/</span>
+  <a class="go" id="ir" href="https://christheras.github.io/PWTools-Guides/">Ir para o novo endereço</a>
+  <p class="sub" id="cont">Você será levado automaticamente em <b id="seg">10</b> s. <button type="button" id="parar">Ficar nesta página</button></p>
+  <div class="links">
+    <a href="https://christheras.github.io/PWTools-Guides/livros/index.html">Livros Divinos</a>
+    <a href="https://christheras.github.io/PWTools-Guides/dusk/index.html">Dusk</a>
+  </div>
+  <noscript><p class="sub">Atualize seus favoritos para <a href="https://christheras.github.io/PWTools-Guides/">https://christheras.github.io/PWTools-Guides/</a>.</p></noscript>
+</main>
+
+<footer>Feito por Heras, junto com o Claude. · <a href="https://www.youtube.com/@christheras" target="_blank" rel="noopener">youtube.com/@christheras</a></footer>
+
+<script>
+(function () {
+  var BASE = 'https://christheras.github.io/PWTools-Guides/';
+  /* O endereço antigo servia o tracker de Livros na raiz e o de Dusk em /dusk/ */
+  var dusk = /\/dusk(\/|$)/i.test(location.pathname);
+  var alvo = BASE + (dusk ? 'dusk/index.html' : 'livros/index.html');
+  var ir = document.getElementById('ir');
+  ir.href = alvo;
+  ir.textContent = dusk ? 'Abrir o Dusk Tracker no novo endereço' : 'Abrir os Livros Divinos no novo endereço';
+  var n = 10, seg = document.getElementById('seg'), cont = document.getElementById('cont');
+  var t = setInterval(function () {
+    n--; seg.textContent = n;
+    if (n <= 0) { clearInterval(t); location.replace(alvo); }
+  }, 1000);
+  document.getElementById('parar').addEventListener('click', function () {
+    clearInterval(t);
+    cont.textContent = 'Redirecionamento cancelado. Atualize seus favoritos para o novo endereço.';
+  });
+})();
+</script>
+
+<script>
+  /* ===== PW Tools: tema compartilhado (padrão v4) =====
+     Copie este bloco IGUAL em toda página nova. A página precisa de:
+       1. <button id="theme"> com um <span aria-hidden="true"> (ícone) e um <span class="tl"> (texto);
+       2. CSS escuro no :root e as cores do tema claro em :root[data-pw-theme="light"].
+     O padrão é escuro. A escolha fica em localStorage na chave 'pw-tools-tema' ('dark' ou 'light'),
+     a mesma para todas as páginas do site. Não usa o endereço (#) da página. */
+  (function () {
+    var KEY = 'pw-tools-tema', TAG = 'pw-tools-tema:';
+    var root = document.documentElement, btn = document.getElementById('theme');
+    function ok(v) { return v === 'dark' || v === 'light' ? v : null; }
+    /* window.name é a reserva para quando o navegador bloqueia o localStorage */
+    function stored() {
+      try { var v = ok(localStorage.getItem(KEY)); if (v) return v; } catch (e) {}
+      try { if (window.name.indexOf(TAG) === 0) return ok(window.name.slice(TAG.length)); } catch (e) {}
+      return null;
+    }
+    function save(v) {
+      try { localStorage.setItem(KEY, v); } catch (e) {}
+      try { if (!window.name || window.name.indexOf(TAG) === 0) window.name = TAG + v; } catch (e) {}
+    }
+    var theme = stored() || 'dark';
+    function apply() {
+      var d = theme === 'dark';
+      root.setAttribute('data-pw-theme', theme);
+      if (!btn) return;
+      var ic = btn.querySelector('[aria-hidden]'), tl = btn.querySelector('.tl');
+      if (ic) ic.textContent = d ? '☀' : '☾';
+      if (tl) tl.textContent = d ? 'Tema claro' : 'Tema escuro';
+      btn.setAttribute('aria-label', d ? 'Mudar para o tema claro' : 'Mudar para o tema escuro');
+    }
+    apply();
+    if (btn) btn.addEventListener('click', function () {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      save(theme);
+      apply();
+    });
+    function sync() { var s = stored() || 'dark'; if (s !== theme) { theme = s; apply(); } }
+    window.addEventListener('pageshow', sync);
+    window.addEventListener('storage', sync);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) sync(); });
+  })();
+  /* ===== fim do tema compartilhado ===== */
+</script>
+</body>
+</html>
